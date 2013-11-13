@@ -30,6 +30,7 @@ public class BillGenerator {
 	printer = HtmlPrinter.getInstance();
     }
 
+    // TODO this method should be renamed but stub left for legacy reasons?
     public void send(final Customer customer, final List<BillingSystem.LineItem> calls, final String totalBill) {
 
 	printer.printHeading(customer.getFullName(), customer.getPhoneNumber(), customer.getPricePlan());
