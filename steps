@@ -2,5 +2,6 @@ Steps taken:
 
 0. Create a git repo
 1. Create an Eclipse project file and custom formatter to ensure everybody follows the same style
-2. Add Junit and JMock to the project and write unit tests
+2. Add JUnit and JMock to the project and write unit tests
 3. Add cucumber and add acceptance tests for current behavior as well as to specify the new requirements.
+4. Inject dependencies.
