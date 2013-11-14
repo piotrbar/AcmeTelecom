@@ -1,6 +1,10 @@
 package com.acmetelecom;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Date;
+import java.util.TimeZone;
 
 import org.junit.After;
 import org.junit.Before;
@@ -18,7 +22,24 @@ public class DaytimePeakPeriodTest {
 
     @Test
     public void testOffPeak() {
-	fail("Not yet implemented");
+
+	final DaytimePeakPeriod period = new DaytimePeakPeriod(7, 19);
+
+	final String[] zones = { "UTC", "WET", "PST", "GMT", "EST", "ECT" };
+	// Change the default timezone and create new dates
+	for (final String zone : zones) {
+	    TimeZone.setDefault(TimeZone.getTimeZone(zone));
+
+	    final Date timePeak = new Date(2013, 11, 12, 8, 10, 10);
+	    final Date timeOffPeakEarly = new Date(2013, 11, 12, 6, 10, 10);
+	    final Date timeOffPeakLate = new Date(2013, 11, 12, 20, 10, 10);
+
+	    System.out.println(timePeak.toString());
+
+	    assertFalse(period.offPeak(timePeak));
+	    assertTrue(period.offPeak(timeOffPeakEarly));
+	    assertTrue(period.offPeak(timeOffPeakLate));
+	}
     }
 
 }

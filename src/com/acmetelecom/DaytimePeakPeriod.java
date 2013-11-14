@@ -5,6 +5,7 @@ import java.util.Date;
 
 class DaytimePeakPeriod {
 
+    // TODO So far we only allow the peak period to start and finish at full hours
     private final int peakStart;
     private final int peakEnd;
 
