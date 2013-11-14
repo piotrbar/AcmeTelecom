@@ -93,6 +93,7 @@ public class BillingSystem {
 	    return call.callee();
 	}
 
+	// TODO Shall we abstract out the Formatter?
 	public String durationMinutes() {
 	    return "" + call.durationSeconds() / 60 + ":" + String.format("%02d", call.durationSeconds() % 60);
 	}

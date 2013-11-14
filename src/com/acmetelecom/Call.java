@@ -1,17 +1,14 @@
 package com.acmetelecom;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 public class Call {
     private final CallEvent start;
     private final CallEvent end;
 
     public Call(final CallEvent start, final CallEvent end) {
-	// Sanity checks. Aid testing.
-	assert start.getCaller().equals(end.getCaller());
-	assert start.getCallee().equals(end.getCallee());
-
 	this.start = start;
 	this.end = end;
     }
@@ -25,14 +22,19 @@ public class Call {
     }
 
     public String date() {
-	return SimpleDateFormat.getInstance().format(new Date(start.time()));
+	// return SimpleDateFormat.getInstance().format(new Date(start.time()));
+
+	// Returns identical string to java.date as before
+	final DateTimeFormatter dtf = DateTimeFormat.shortDateTime();
+	return new DateTime(System.currentTimeMillis()).toString(dtf);
+
     }
 
-    public Date startTime() {
-	return new Date(start.time());
+    public DateTime startTime() {
+	return new DateTime(start.time());
     }
 
-    public Date endTime() {
-	return new Date(end.time());
+    public DateTime endTime() {
+	return new DateTime(end.time());
     }
 }

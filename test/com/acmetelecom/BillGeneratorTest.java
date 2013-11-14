@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.Sequence;
 import org.jmock.integration.junit4.JMock;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -86,13 +87,17 @@ public class BillGeneratorTest {
 	// Testing the BillGenerator with a mock printer
 	final BillGenerator billGenerator = new BillGenerator(printer);
 
+	final Sequence printSequence = context.sequence("printSequence");
 	// Make sure everything gets printed
 	context.checking(new Expectations() {
 	    {
-		oneOf(printer).printHeading(with(equal(customerName)), with(equal(customerNumber)), with(equal(customerPlan)));
-		exactly(calls.size()).of(printer)
-			.printItem(with(equal(time)), with(equal(callee)), with(equal(duration)), with(equal(MoneyFormatter.penceToPounds(cost))));
-		oneOf(printer).printTotal(with(equal(totalBill)));
+		oneOf(printer).printHeading(with(equal(customerName)), with(equal(customerNumber)), with(equal(customerPlan))); inSequence(printSequence);
+		exactly(calls.size()).of(printer).printItem(
+			with(equal(time)), 
+			with(equal(callee)), 
+			with(equal(duration)), 
+			with(equal(MoneyFormatter.penceToPounds(cost)))); inSequence(printSequence);
+		oneOf(printer).printTotal(with(equal(totalBill))); inSequence(printSequence);
 	    }
 	});
 
