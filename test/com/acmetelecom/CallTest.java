@@ -26,8 +26,9 @@ public class CallTest {
     final String callee = "447766511332";
 
     final long time = System.currentTimeMillis();
-    final long timeStart = time + 5000;
-    final long timeEnd = time - 5000;
+    final long duration = 10000;
+    final long startTime = time - duration / 2;
+    final long endTime = time + duration / 2;
 
     // Mock the CallStart and CallEnd events
     final CallStart start = context.mock(CallStart.class);
@@ -43,33 +44,45 @@ public class CallTest {
 		allowing(start).getCallee();
 		will(returnValue(callee));
 		allowing(start).time();
-		will(returnValue(timeStart));
+		will(returnValue(startTime));
 	    }
 	});
 
 	// Set up the call end event
 	context.checking(new Expectations() {
 	    {
-		allowing(start).getCaller();
+		allowing(end).getCaller();
 		will(returnValue(caller));
-		allowing(start).getCallee();
+		allowing(end).getCallee();
 		will(returnValue(callee));
-		allowing(start).time();
-		will(returnValue(timeEnd));
+		allowing(end).time();
+		will(returnValue(endTime));
 	    }
 	});
     }
 
     @Test
     public void testCallee() {
-	// Creating a Call test object from start to end
 	final Call call = new Call(start, end);
-
+	assertEquals(call.callee(), callee);
     }
 
     @Test
     public void testDurationSeconds() {
-	final MathOp a = new MathOp();
-	assertEquals(-4, a.sub(-3, 1));
+	final Call call = new Call(start, end);
+	assertEquals(duration / 1000, call.durationSeconds());
     }
+
+    @Test
+    public void testStartTime() {
+	final Call call = new Call(start, end);
+	assertEquals(startTime, call.startTime().getTime());
+    }
+
+    @Test
+    public void testEndTime() {
+	final Call call = new Call(start, end);
+	assertEquals(endTime, call.endTime().getTime());
+    }
+
 }

@@ -1,11 +1,11 @@
 package com.acmetelecom;
 
-import org.joda.time.DateTime;
+import java.util.Calendar;
+import java.util.Date;
 
 class DaytimePeakPeriod {
 
-    // TODO So far we only allow the peak period to start and finish at full
-    // hours
+    // TODO So far we only allow the peak period to start and finish at full hours
     private final int peakStart;
     private final int peakEnd;
 
@@ -22,13 +22,10 @@ class DaytimePeakPeriod {
 	peakEnd = 19;
     }
 
-    public boolean offPeak(final DateTime time) {
-	// final Calendar calendar = Calendar.getInstance();
-	// calendar.setTime(time);
-	// final int hour = calendar.get(Calendar.HOUR_OF_DAY);
-
-	final int hour = time.getHourOfDay();
-
+    public boolean offPeak(final Date time) {
+	final Calendar calendar = Calendar.getInstance();
+	calendar.setTime(time);
+	final int hour = calendar.get(Calendar.HOUR_OF_DAY);
 	return hour < peakStart || hour >= peakEnd;
     }
 }

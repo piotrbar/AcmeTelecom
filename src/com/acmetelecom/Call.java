@@ -1,8 +1,7 @@
 package com.acmetelecom;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Call {
     private final CallEvent start;
@@ -22,19 +21,14 @@ public class Call {
     }
 
     public String date() {
-	// return SimpleDateFormat.getInstance().format(new Date(start.time()));
-
-	// Returns identical string to java.date as before
-	final DateTimeFormatter dtf = DateTimeFormat.shortDateTime();
-	return new DateTime(System.currentTimeMillis()).toString(dtf);
-
+	return SimpleDateFormat.getInstance().format(new Date(start.time()));
     }
 
-    public DateTime startTime() {
-	return new DateTime(start.time());
+    public Date startTime() {
+	return new Date(start.time());
     }
 
-    public DateTime endTime() {
-	return new DateTime(end.time());
+    public Date endTime() {
+	return new Date(end.time());
     }
 }
