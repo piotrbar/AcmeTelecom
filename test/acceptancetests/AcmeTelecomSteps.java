@@ -3,16 +3,21 @@ package acceptancetests;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import org.jbehave.core.annotations.AfterStories;
-import org.jbehave.core.annotations.BeforeStories;
+import org.jbehave.core.annotations.AfterScenario;
+import org.jbehave.core.annotations.BeforeScenario;
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Node;
+import org.jsoup.select.Elements;
 import org.junit.Assert;
 
 import com.acmetelecom.BillingSystem;
 import com.acmetelecom.ListCallLog;
+import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 
 public class AcmeTelecomSteps {
 
@@ -21,7 +26,7 @@ public class AcmeTelecomSteps {
     private ByteArrayOutputStream tempOutContent;
     private final PrintStream out = System.out;
 
-    @BeforeStories
+    @BeforeScenario
     public void init() {
 	billingSystem = new BillingSystem(new ListCallLog());
 	tempOutContent = new ByteArrayOutputStream();
@@ -29,7 +34,7 @@ public class AcmeTelecomSteps {
 	System.setOut(tempOut);
     }
 
-    @AfterStories
+    @AfterScenario
     public void cleanUp() {
 	System.out.flush();
 	System.setOut(out);
@@ -38,7 +43,9 @@ public class AcmeTelecomSteps {
     /* -------------- GIVEN ---------------- */
 
     @Given("user $user1No called user $user2No for $seconds seconds")
-    public void given_user_called_another_user(final String user1No, final String user2No, final int seconds) throws InterruptedException {
+    public void given_user_called_another_user(final String user1No,
+	    final String user2No, final int seconds)
+	    throws InterruptedException {
 	billingSystem.callInitiated(user1No, user2No);
 	sleepSeconds(seconds);
 	billingSystem.callCompleted(user1No, user2No);
@@ -51,12 +58,32 @@ public class AcmeTelecomSteps {
 	billingSystem.createCustomerBills();
     }
 
+    @When("user $user1No calls user $user2No")
+    public void when_user_calls(final String user1No, final String user2No)
+	    throws InterruptedException {
+	billingSystem.callInitiated(user1No, user2No);
+    }
+
     /* -------------- THEN ---------------- */
 
     @Then("the bill for user $userNo contains $calls calls")
-    public void then_user_is_charged(final String userNo, final int expectedCalls) {
-	final String html = tempOutContent.toString();
-	final int actualCalls = Jsoup.parse(html).getElementsContainingOwnText(userNo).first().nextElementSibling().childNodes().size();
+    public void then_the_bill_contains_calls(final String userNo,
+	    final int expectedCalls) {
+	final Elements elements = Jsoup.parse(tempOutContent.toString())
+		.getElementsContainingOwnText(userNo);
+	int actualCalls = 0;
+	if (elements != null && elements.first() != null
+		&& elements.first().nextElementSibling() != null
+		&& elements.first().nextElementSibling().childNodeSize() > 1) {
+	    actualCalls = Iterables.size(Iterables.filter(elements.first()
+		    .nextElementSibling().childNode(1).childNodes(),
+		    new Predicate<Node>() {
+			@Override
+			public boolean apply(final Node n) {
+			    return Strings.isNullOrEmpty(n.toString().trim());
+			}
+		    })) - 1;
+	}
 	Assert.assertEquals(expectedCalls, actualCalls);
     }
 

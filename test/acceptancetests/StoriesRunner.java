@@ -21,17 +21,24 @@ public class StoriesRunner extends JUnitStories {
     private final int storyThreads = 2;
 
     public StoriesRunner() {
-	configuredEmbedder().embedderControls().doGenerateViewAfterStories(true).doIgnoreFailureInStories(true).doIgnoreFailureInView(true)
+	configuredEmbedder().embedderControls()
+		.doGenerateViewAfterStories(true)
+		.doIgnoreFailureInStories(true).doIgnoreFailureInView(true)
 		.useThreads(storyThreads).useStoryTimeoutInSecs(storyTimeout);
     }
 
     @Override
     public Configuration configuration() {
 	return new MostUsefulConfiguration()
-		.useStoryControls(new StoryControls().doDryRun(false).doSkipScenariosAfterFailure(false))
+		.useStoryControls(
+			new StoryControls().doDryRun(false)
+				.doSkipScenariosAfterFailure(false))
 		.useStoryLoader(new LoadFromClasspath(this.getClass()))
 		.useStoryReporterBuilder(
-			new StoryReporterBuilder().withFormats(Format.CONSOLE, Format.HTML).withFailureTrace(true).withFailureTraceCompression(true));
+			new StoryReporterBuilder()
+				.withFormats(Format.CONSOLE, Format.HTML)
+				.withFailureTrace(true)
+				.withFailureTraceCompression(true));
     }
 
     @Override
@@ -41,6 +48,8 @@ public class StoriesRunner extends JUnitStories {
 
     @Override
     protected List<String> storyPaths() {
-	return finder.findPaths(CodeLocations.codeLocationFromClass(this.getClass()), "**/*.story", "");
+	return finder.findPaths(
+		CodeLocations.codeLocationFromClass(this.getClass()),
+		"**/*.story", "");
     }
 }
