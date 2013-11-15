@@ -32,14 +32,10 @@ public class BillGenerator {
 
     // TODO this method should be renamed but stub left for legacy reasons?
     public void send(final Customer customer, final List<BillingSystem.LineItem> calls, final String totalBill) {
-
 	printer.printHeading(customer.getFullName(), customer.getPhoneNumber(), customer.getPricePlan());
 	for (final BillingSystem.LineItem call : calls) {
-	    printer.printItem(call.date(), call.callee(), call.durationMinutes(), MoneyFormatter.penceToPounds(call.cost())); // TODO
-															      // MoneyFromatter
-															      // should
-															      // be
-															      // injected?
+	    printer.printItem(call.date(), call.callee(), call.durationMinutes(), MoneyFormatter.penceToPounds(call.cost()));
+	    // TODO MoneyFromatter should be injected?
 	}
 	printer.printTotal(totalBill);
     }
