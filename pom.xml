@@ -24,19 +24,9 @@
     <version>15.0</version>
 </dependency>
   	<dependency>
-  		<groupId>org.springframework</groupId>
-  		<artifactId>spring-beans</artifactId>
-  		<version>3.2.4.RELEASE</version>
-  	</dependency>
-  	<dependency>
   		<groupId>junit</groupId>
   		<artifactId>junit</artifactId>
   		<version>4.11</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.jmock</groupId>
-  		<artifactId>jmock-junit4</artifactId>
-  		<version>2.6.0</version>
   	</dependency>
   	<dependency>
   		<groupId>org.jbehave</groupId>
@@ -48,21 +38,6 @@
   		<groupId>org.jbehave</groupId>
   		<artifactId>jbehave-core</artifactId>
   		<version>4.0-beta-3</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.springframework</groupId>
-  		<artifactId>spring-core</artifactId>
-  		<version>3.2.4.RELEASE</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.springframework</groupId>
-  		<artifactId>spring-context</artifactId>
-  		<version>3.2.4.RELEASE</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.springframework</groupId>
-  		<artifactId>spring-expression</artifactId>
-  		<version>3.2.4.RELEASE</version>
   	</dependency>
   	<dependency>
   		<groupId>org.apache.logging.log4j</groupId>
@@ -82,9 +57,19 @@
   		<type>maven-plugin</type>
   	</dependency>
   	<dependency>
-  		<groupId>com.google.guava</groupId>
-  		<artifactId>guava-base</artifactId>
-  		<version>r03</version>
+  		<groupId>joda-time</groupId>
+  		<artifactId>joda-time</artifactId>
+  		<version>2.3</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.jmock</groupId>
+  		<artifactId>jmock-legacy</artifactId>
+  		<version>2.6.0</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.jmock</groupId>
+  		<artifactId>jmock-junit4</artifactId>
+  		<version>2.6.0</version>
   	</dependency>
   </dependencies>
 </project>
