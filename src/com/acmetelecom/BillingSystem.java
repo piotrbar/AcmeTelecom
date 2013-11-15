@@ -12,14 +12,20 @@ import com.acmetelecom.customer.Tariff;
 
 public class BillingSystem {
 
-    private final List<CallEvent> callLog = new ArrayList<CallEvent>();
+    private final CallLog callLog;
+
+    public BillingSystem(final CallLog callLog) {
+	this.callLog = callLog;
+    }
 
     public void callInitiated(final String caller, final String callee) {
-	callLog.add(new CallStart(caller, callee));
+	callLog.callInitiated(caller, callee);
+	// callLog.add(new CallStart(caller, callee));
     }
 
     public void callCompleted(final String caller, final String callee) {
-	callLog.add(new CallEnd(caller, callee));
+	callLog.callCompleted(caller, callee);
+	// callLog.add(new CallEnd(caller, callee));
     }
 
     public void createCustomerBills() {
@@ -27,12 +33,12 @@ public class BillingSystem {
 	for (final Customer customer : customers) {
 	    createBillFor(customer);
 	}
-	callLog.clear();
+	callLog.clearCompletedCalls();
     }
 
     private void createBillFor(final Customer customer) {
 	final List<CallEvent> customerEvents = new ArrayList<CallEvent>();
-	for (final CallEvent callEvent : callLog) {
+	for (final CallEvent callEvent : callLog.getCallEvents()) {
 	    if (callEvent.getCaller().equals(customer.getPhoneNumber())) {
 		customerEvents.add(callEvent);
 	    }

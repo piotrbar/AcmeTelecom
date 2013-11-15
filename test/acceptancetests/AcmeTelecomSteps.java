@@ -3,16 +3,16 @@ package acceptancetests;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import junit.framework.Assert;
-
 import org.jbehave.core.annotations.AfterStories;
 import org.jbehave.core.annotations.BeforeStories;
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
 import org.jsoup.Jsoup;
+import org.junit.Assert;
 
 import com.acmetelecom.BillingSystem;
+import com.acmetelecom.ListCallLog;
 
 public class AcmeTelecomSteps {
 
@@ -23,7 +23,7 @@ public class AcmeTelecomSteps {
 
     @BeforeStories
     public void init() {
-	billingSystem = new BillingSystem();
+	billingSystem = new BillingSystem(new ListCallLog());
 	tempOutContent = new ByteArrayOutputStream();
 	tempOut = new PrintStream(tempOutContent);
 	System.setOut(tempOut);
