@@ -9,52 +9,47 @@ import com.acmetelecom.BillingSystem.LineItem;
 import com.acmetelecom.customer.CentralCustomerDatabase;
 import com.acmetelecom.customer.CentralTariffDatabase;
 import com.acmetelecom.customer.Customer;
+import com.acmetelecom.customer.CustomerDatabase;
 import com.acmetelecom.customer.Tariff;
+import com.acmetelecom.customer.TariffLibrary;
 
 public class Biller {
     private final CallLog callLog;
+    private final TariffLibrary tariffLibrary;
+    private final CustomerDatabase customerDatabase;
+    private final BillGenerator billGenerator;
 
-    public Biller(final CallLog callLog) {
+    public Biller(final CallLog callLog, final BillGenerator billGenerator) {
 	this.callLog = callLog;
+	this.billGenerator = billGenerator;
+	this.tariffLibrary = CentralTariffDatabase.getInstance();
+	this.customerDatabase = CentralCustomerDatabase.getInstance();
+    }
+
+    public Biller(final CallLog callLog, final TariffLibrary tariffLibrary, final CustomerDatabase customerDatabase, final BillGenerator billGenerator) {
+	this.callLog = callLog;
+	this.tariffLibrary = tariffLibrary;
+	this.customerDatabase = customerDatabase;
+	this.billGenerator = billGenerator;
     }
 
     public void createCustomerBills() {
-	final List<Customer> customers = CentralCustomerDatabase.getInstance().getCustomers();
+	final List<Customer> customers = this.customerDatabase.getCustomers();
 	for (final Customer customer : customers) {
-	    createBillFor(customer);
+	    this.createBillFor(customer);
 	}
-	callLog.clearCompletedCalls();
+	this.callLog.clearCompletedCalls();
     }
 
     private void createBillFor(final Customer customer) {
-	// final List<CallEvent> customerEvents = new ArrayList<CallEvent>();
-	// for (final CallEvent callEvent : callLog.getCallEvents()) {
-	// if (callEvent.getCaller().equals(customer.getPhoneNumber())) {
-	// customerEvents.add(callEvent);
-	// }
-	// }
-	//
-	// final List<Call> calls = new ArrayList<Call>();
-	//
-	// CallEvent start = null;
-	// for (final CallEvent event : customerEvents) {
-	// if (event instanceof CallStart) {
-	// start = event;
-	// }
-	// if (event instanceof CallEnd && start != null) {
-	// calls.add(new Call(start, event));
-	// start = null;
-	// }
-	// }
-
-	final List<Call> calls = callLog.getCalls(customer.getPhoneNumber());
+	final List<Call> calls = this.callLog.getCallsForCustomer(customer.getPhoneNumber());
 
 	BigDecimal totalBill = new BigDecimal(0);
 	final List<LineItem> items = new ArrayList<LineItem>();
 
 	for (final Call call : calls) {
 
-	    final Tariff tariff = CentralTariffDatabase.getInstance().tarriffFor(customer);
+	    final Tariff tariff = this.tariffLibrary.tarriffFor(customer);
 
 	    BigDecimal cost;
 
@@ -71,6 +66,6 @@ public class Biller {
 	    items.add(new LineItem(call, callCost));
 	}
 
-	new BillGenerator().send(customer, items, MoneyFormatter.penceToPounds(totalBill));
+	this.billGenerator.send(customer, items, MoneyFormatter.penceToPounds(totalBill));
     }
 }

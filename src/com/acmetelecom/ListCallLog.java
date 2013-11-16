@@ -28,7 +28,7 @@ public class ListCallLog implements CallLog {
     }
 
     @Override
-    public List<Call> getCalls(final String caller) {
+    public List<Call> getCallsForCustomer(final String caller) {
 	return callHistory.get(caller);
     }
 }

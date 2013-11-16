@@ -7,5 +7,5 @@ public interface CallLog {
 
     public void clearCompletedCalls();
 
-    public List<Call> getCalls(String caller);
+    public List<Call> getCallsForCustomer(String caller);
 }
