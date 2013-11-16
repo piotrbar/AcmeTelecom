@@ -9,28 +9,28 @@ public class CallTracker {
     private final CallLog callLog;
 
     public CallTracker(final CallLog callLog) {
-	activeCalls = new HashMap<String, Call>();
+	this.activeCalls = new HashMap<String, Call>();
 	this.callLog = callLog;
     }
 
     public void callInitiated(final String caller, final String callee) {
-	if (!callInProgress(caller)) {
-	    activeCalls.put(caller, new Call(caller, callee, System.currentTimeMillis()));
+	if (!this.callInProgress(caller)) {
+	    this.activeCalls.put(caller, new Call(caller, callee, System.currentTimeMillis()));
 	} else {
 	    // TODO
 	}
     }
 
     public boolean callInProgress(final String caller) {
-	return activeCalls.containsKey(caller);
+	return this.activeCalls.containsKey(caller);
     }
 
     public void callCompleted(final String caller, final String callee) {
-	final Call call = activeCalls.get(caller);
+	final Call call = this.activeCalls.get(caller);
 	if (call != null && call.callee().equals(callee)) {
-	    call.complete(System.currentTimeMillis());
-	    callLog.addCall(call);
-	    activeCalls.remove(caller);
+	    call.completed(System.currentTimeMillis());
+	    this.callLog.addCall(call);
+	    this.activeCalls.remove(caller);
 	} else {
 	    // TODO
 	}
