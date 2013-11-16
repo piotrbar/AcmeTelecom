@@ -45,12 +45,7 @@ public class CallTest {
 		will(returnValue(callee));
 		allowing(start).time();
 		will(returnValue(startTime));
-	    }
-	});
 
-	// Set up the call end event
-	context.checking(new Expectations() {
-	    {
 		allowing(end).getCaller();
 		will(returnValue(caller));
 		allowing(end).getCallee();
@@ -59,12 +54,6 @@ public class CallTest {
 		will(returnValue(endTime));
 	    }
 	});
-    }
-
-    @Test
-    public void testCallee() {
-	final Call call = new Call(start, end);
-	assertEquals(call.callee(), callee);
     }
 
     @Test

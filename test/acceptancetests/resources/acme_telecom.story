@@ -1,6 +1,6 @@
 Story: As a billing controller I want to generate customers' bills and interact with the billing system api.
 
-Scenario: A user that did not made any calls is not charged at all
+Scenario: A user that did not make any calls is not charged at all
 When all the bills are generated
 Then the bill for user 447722113434 contains 0 calls
 
