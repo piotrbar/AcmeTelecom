@@ -12,6 +12,8 @@ public class BillingSystemTest {
     Mockery context = new Mockery();
     final String caller = "1234";
     final String callee = "5678";
+    final CallLog callLog = context.mock(CallLog.class);
+    final BillingSystem billingSystem = new BillingSystem(callLog);
 
     @Before
     public void setUp() throws Exception {
@@ -22,9 +24,7 @@ public class BillingSystemTest {
     }
 
     @Test
-    public void testCallInitiated() {
-	final CallLog callLog = context.mock(CallLog.class);
-	final BillingSystem billingSystem = new BillingSystem(callLog);
+    public void testCallInitiated() throws InvalidCallException {
 	context.checking(new Expectations() {
 	    {
 		oneOf(callLog).callInitiated(caller, callee);
@@ -33,9 +33,32 @@ public class BillingSystemTest {
 	billingSystem.callInitiated(caller, callee);
     }
 
+    @Test(expected = InvalidCallException.class)
+    public void testOnlyOneActiveCallPerCaller() throws InvalidCallException {
+	testCallInitiated();
+	billingSystem.callInitiated(caller, callee);
+    }
+
     @Test
-    public void testCallCompleted() {
-	fail("Not yet implemented");
+    public void testCallCompleted() throws InvalidCallException {
+	testCallInitiated();
+	context.checking(new Expectations() {
+	    {
+		oneOf(callLog).callCompleted(caller, callee);
+	    }
+	});
+	billingSystem.callCompleted(caller, callee);
+    }
+
+    @Test(expected = InvalidCallException.class)
+    public void testOnlyActiveCallCanBeCompleted() throws InvalidCallException {
+	billingSystem.callCompleted(caller, callee);
+    }
+
+    @Test(expected = InvalidCallException.class)
+    public void testActiveCallCanOnlyBeCompletedOnce() throws InvalidCallException {
+	testCallCompleted();
+	billingSystem.callCompleted(caller, callee);
     }
 
     @Test

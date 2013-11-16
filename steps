@@ -5,3 +5,14 @@ Steps taken:
 2. Add JUnit and JMock to the project and write unit tests
 3. Add cucumber and add acceptance tests for current behavior as well as to specify the new requirements.
 4. Inject dependencies.
+
+
+
+
+
+
+
+
+// Jonny
+reflection vs. refactoring calllog to new component
+who should decide start time?

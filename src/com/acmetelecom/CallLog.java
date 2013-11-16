@@ -3,11 +3,9 @@ package com.acmetelecom;
 import java.util.List;
 
 public interface CallLog {
-    public void callInitiated(String caller, String callee);
-
-    public void callCompleted(String caller, String callee);
+    public void addCall(final Call c);
 
     public void clearCompletedCalls();
 
-    public List<CallEvent> getCallEvents();
+    public List<Call> getCalls(String caller);
 }
