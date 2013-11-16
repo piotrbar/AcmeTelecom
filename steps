@@ -16,3 +16,10 @@ Steps taken:
 // Jonny
 reflection vs. refactoring calllog to new component
 who should decide start time?
+
+CallStart and CallEnd deprecated - we now just use Call class for tracking active calls and completed calls.
+
+BillingSystem originally responsible for storing call history, creating and terminating new calls, and calculating bills. We want separation of responsibility.
+We created CallTracker class for tracking active calls and saving completed calls to the new CallLog class (interface as we may want different implementations, e.g. in-memory list based vs database etc.)
+Biller class responsible for calculating tariffs (strategy pattern?)
+To maintain backwards compatibility BillingSystem class keeps methods but they are just hooks to CallTracker/Biller methods.
