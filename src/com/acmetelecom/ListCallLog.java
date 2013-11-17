@@ -9,26 +9,30 @@ public class ListCallLog implements CallLog {
     Map<String, List<Call>> callHistory;
 
     public ListCallLog() {
-	callHistory = new HashMap<String, List<Call>>();
+	this.callHistory = new HashMap<String, List<Call>>();
     }
 
     @Override
     public void clearCompletedCalls() {
-	callHistory.clear();
+	this.callHistory.clear();
     }
 
     @Override
     public void addCall(final Call c) {
-	List<Call> callerHistory = callHistory.get(c.caller());
+	List<Call> callerHistory = this.callHistory.get(c.caller());
 	if (callerHistory == null) {
 	    callerHistory = new LinkedList<Call>();
 	}
 	callerHistory.add(c);
-	callHistory.put(c.caller(), callerHistory);
+	this.callHistory.put(c.caller(), callerHistory);
     }
 
     @Override
-    public List<Call> getCallsForCustomer(final String caller) {
-	return callHistory.get(caller);
+    public Iterable<Call> getCallsForCustomer(final String caller) {
+	if (this.callHistory.containsKey(caller)) {
+	    return this.callHistory.get(caller);
+	} else {
+	    return new LinkedList<Call>();
+	}
     }
 }

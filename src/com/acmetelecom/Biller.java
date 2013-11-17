@@ -42,7 +42,7 @@ public class Biller {
     }
 
     private void createBillFor(final Customer customer) {
-	final List<Call> calls = this.callLog.getCallsForCustomer(customer.getPhoneNumber());
+	final Iterable<Call> calls = this.callLog.getCallsForCustomer(customer.getPhoneNumber());
 
 	BigDecimal totalBill = new BigDecimal(0);
 	final List<LineItem> items = new ArrayList<LineItem>();
