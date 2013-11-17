@@ -1,10 +1,9 @@
 package com.acmetelecom;
 
-import static org.junit.Assert.fail;
-
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -123,6 +122,8 @@ public class BillerTest {
 	    }
 	});
 
+	TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+
 	// Each customer calls their mother for an hour in offpeak time
 	// The default peak time is between 7 and 19
 	final long hourLength = 1000 * 60 * 60;
@@ -165,6 +166,43 @@ public class BillerTest {
 
     @Test
     public void testCorrectTotalSpanningPeakAndOffPeak() {
-	fail("Not implemented");
+	// Each customer is on a different tariff
+	this.context.checking(new Expectations() {
+	    {
+		this.allowing(BillerTest.this.tariffLibrary).tarriffFor(this.with(equal(BillerTest.this.customers.get(0))));
+		this.will(returnValue(Tariff.Business));
+		this.allowing(BillerTest.this.tariffLibrary).tarriffFor(this.with(equal(BillerTest.this.customers.get(1))));
+		this.will(returnValue(Tariff.Leisure));
+		this.allowing(BillerTest.this.tariffLibrary).tarriffFor(this.with(equal(BillerTest.this.customers.get(2))));
+		this.will(returnValue(Tariff.Standard));
+	    }
+	});
+
+	TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+
+	// Each customer calls their mother
+	// The default peak time is between 7 and 19
+	final long hourLength = 1000 * 60 * 60;
+	// 6am to 8am = 2hr long
+	this.callLog.addCall(new Call(this.customers.get(0).getPhoneNumber(), "mother", hourLength * 6, hourLength * 8));
+	// 6pm to 8pm = 2hr long
+	this.callLog.addCall(new Call(this.customers.get(1).getPhoneNumber(), "mother", hourLength * 18, hourLength * 20));
+	// 6am to 8pm = 14hr long
+	this.callLog.addCall(new Call(this.customers.get(2).getPhoneNumber(), "mother", hourLength * 6, hourLength * 20));
+
+	final BigDecimal twoHoursInSeconds = new BigDecimal(2 * 60 * 60);
+	final BigDecimal fourteenHoursInSeconds = new BigDecimal(14 * 60 * 60);
+	this.context.checking(new Expectations() {
+	    {
+		this.oneOf(BillerTest.this.billGenerator).send(this.with(equal(BillerTest.this.customers.get(0))), this.with(any(List.class)),
+			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Business.peakRate().multiply(twoHoursInSeconds)))));
+		this.oneOf(BillerTest.this.billGenerator).send(this.with(equal(BillerTest.this.customers.get(1))), this.with(any(List.class)),
+			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Leisure.peakRate().multiply(twoHoursInSeconds)))));
+		this.oneOf(BillerTest.this.billGenerator).send(this.with(equal(BillerTest.this.customers.get(2))), this.with(any(List.class)),
+			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Standard.peakRate().multiply(fourteenHoursInSeconds)))));
+	    }
+	});
+
+	this.biller.createCustomerBills();
     }
 }
