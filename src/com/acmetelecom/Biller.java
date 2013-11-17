@@ -54,6 +54,7 @@ public class Biller {
 	    BigDecimal cost;
 
 	    final DaytimePeakPeriod peakPeriod = new DaytimePeakPeriod();
+	    // TODO Why does the call have to be less than 12hrs?
 	    if (peakPeriod.offPeak(call.startTime()) && peakPeriod.offPeak(call.endTime()) && call.durationSeconds() < 12 * 60 * 60) {
 		cost = new BigDecimal(call.durationSeconds()).multiply(tariff.offPeakRate());
 	    } else {

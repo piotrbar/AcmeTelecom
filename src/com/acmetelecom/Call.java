@@ -3,6 +3,8 @@ package com.acmetelecom;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+// TODO There should be a factory or builder to create those calls with a meaningful fluid interface call. 
+// The constructor parameters are super difficult to understand
 public class Call {
 
     private final String caller;
@@ -32,6 +34,13 @@ public class Call {
 	this.callee = start.getCallee();
 	this.timeStart = start.time();
 	this.timeEnd = end.time();
+    }
+
+    public Call(final String caller, final String callee, final long timeStart, final long timeEnd) {
+	this.caller = caller;
+	this.callee = callee;
+	this.timeStart = timeStart;
+	this.timeEnd = timeEnd;
     }
 
     public String caller() {

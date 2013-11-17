@@ -2,6 +2,7 @@ package com.acmetelecom;
 
 import static org.junit.Assert.fail;
 
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import org.junit.Test;
 
 import com.acmetelecom.customer.Customer;
 import com.acmetelecom.customer.CustomerDatabase;
+import com.acmetelecom.customer.Tariff;
 import com.acmetelecom.customer.TariffLibrary;
 
 public class BillerTest {
@@ -28,10 +30,13 @@ public class BillerTest {
     private BillGenerator billGenerator;
     private List<Customer> customers;
 
+    private CallLog callLog;
+
+    private TariffLibrary tariffLibrary;
+
     @Before
     public void setUp() {
-	// Mock the tariff database
-	final TariffLibrary tariffLibrary = this.context.mock(TariffLibrary.class);
+	this.tariffLibrary = this.context.mock(TariffLibrary.class);
 
 	// Mock the customer database with 3 customers
 	final CustomerDatabase customerDatabase = this.context.mock(CustomerDatabase.class);
@@ -76,15 +81,14 @@ public class BillerTest {
 	    }
 	});
 
-	// Create a new call-log, no need to mock this simple class
-	final CallLog callLog = new ListCallLog();
+	this.callLog = new ListCallLog();
 
 	// Mock the bill generator, we don't want to be actually sending the
 	// bills to anybody
 	this.billGenerator = this.context.mock(BillGenerator.class);
 
 	// Create the biller to test injecting all the dependencies
-	this.biller = new Biller(callLog, tariffLibrary, customerDatabase, this.billGenerator);
+	this.biller = new Biller(this.callLog, this.tariffLibrary, customerDatabase, this.billGenerator);
 
     }
 
@@ -107,7 +111,56 @@ public class BillerTest {
 
     @Test
     public void testDifferentCustomersAreChargedAccordingToDifferentTarrifs() {
-	fail("Not implemented");
+	// Each customer is on a different tariff
+	this.context.checking(new Expectations() {
+	    {
+		this.allowing(BillerTest.this.tariffLibrary).tarriffFor(this.with(equal(BillerTest.this.customers.get(0))));
+		this.will(returnValue(Tariff.Business));
+		this.allowing(BillerTest.this.tariffLibrary).tarriffFor(this.with(equal(BillerTest.this.customers.get(1))));
+		this.will(returnValue(Tariff.Leisure));
+		this.allowing(BillerTest.this.tariffLibrary).tarriffFor(this.with(equal(BillerTest.this.customers.get(2))));
+		this.will(returnValue(Tariff.Standard));
+	    }
+	});
+
+	// Each customer calls their mother for an hour in offpeak time
+	// The default peak time is between 7 and 19
+	final long hourLength = 1000 * 60 * 60;
+	long timeStart = hourLength * 3; // 3am
+	for (final Customer customer : this.customers) {
+	    this.callLog.addCall(new Call(customer.getPhoneNumber(), "mother", timeStart, timeStart + hourLength));
+	}
+	final BigDecimal hourInSeconds = new BigDecimal(60 * 60);
+	this.context.checking(new Expectations() {
+	    {
+		this.oneOf(BillerTest.this.billGenerator).send(this.with(equal(BillerTest.this.customers.get(0))), this.with(any(List.class)),
+			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Business.offPeakRate().multiply(hourInSeconds)))));
+		this.oneOf(BillerTest.this.billGenerator).send(this.with(equal(BillerTest.this.customers.get(1))), this.with(any(List.class)),
+			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Leisure.offPeakRate().multiply(hourInSeconds)))));
+		this.oneOf(BillerTest.this.billGenerator).send(this.with(equal(BillerTest.this.customers.get(2))), this.with(any(List.class)),
+			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Standard.offPeakRate().multiply(hourInSeconds)))));
+	    }
+	});
+
+	this.biller.createCustomerBills();
+	this.callLog.clearCompletedCalls();
+
+	// Each customer calls their mother for an hour in peak time
+	// The default peak time is between 7 and 19
+	timeStart = hourLength * 15; // 3pm
+	for (final Customer customer : this.customers) {
+	    this.callLog.addCall(new Call(customer.getPhoneNumber(), "mother", timeStart, timeStart + hourLength));
+	}
+	this.context.checking(new Expectations() {
+	    {
+		this.oneOf(BillerTest.this.billGenerator).send(this.with(equal(BillerTest.this.customers.get(0))), this.with(any(List.class)),
+			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Business.peakRate().multiply(hourInSeconds)))));
+		this.oneOf(BillerTest.this.billGenerator).send(this.with(equal(BillerTest.this.customers.get(1))), this.with(any(List.class)),
+			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Leisure.peakRate().multiply(hourInSeconds)))));
+		this.oneOf(BillerTest.this.billGenerator).send(this.with(equal(BillerTest.this.customers.get(2))), this.with(any(List.class)),
+			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Standard.peakRate().multiply(hourInSeconds)))));
+	    }
+	});
     }
 
     @Test
