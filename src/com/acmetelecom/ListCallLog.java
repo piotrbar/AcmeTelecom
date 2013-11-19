@@ -7,31 +7,31 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 public class ListCallLog implements CallLog {
-    Map<String, List<Call>> callHistory;
+    private final Map<String, List<Call>> callHistory;
 
     public ListCallLog() {
-	this.callHistory = Maps.newHashMap();
+	callHistory = Maps.newHashMap();
     }
 
     @Override
     public void clearCompletedCalls() {
-	this.callHistory.clear();
+	callHistory.clear();
     }
 
     @Override
     public void addCall(final Call c) {
-	List<Call> callerHistory = this.callHistory.get(c.caller());
+	List<Call> callerHistory = callHistory.get(c.caller());
 	if (callerHistory == null) {
 	    callerHistory = new LinkedList<Call>();
 	}
 	callerHistory.add(c);
-	this.callHistory.put(c.caller(), callerHistory);
+	callHistory.put(c.caller(), callerHistory);
     }
 
     @Override
     public Iterable<Call> getCallsForCustomer(final String caller) {
-	if (this.callHistory.containsKey(caller)) {
-	    return this.callHistory.get(caller);
+	if (callHistory.containsKey(caller)) {
+	    return callHistory.get(caller);
 	} else {
 	    return new LinkedList<Call>();
 	}

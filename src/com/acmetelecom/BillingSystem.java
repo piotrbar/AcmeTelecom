@@ -16,15 +16,15 @@ public class BillingSystem {
     }
 
     public void callInitiated(final String caller, final String callee) {
-	this.callTracker.callInitiated(caller, callee);
+	callTracker.callInitiated(caller, callee);
     }
 
     public void callCompleted(final String caller, final String callee) {
-	this.callTracker.callCompleted(caller, callee);
+	callTracker.callCompleted(caller, callee);
     }
 
     public void createCustomerBills() {
-	this.biller.createCustomerBills();
+	biller.createCustomerBills();
     }
 
     static class LineItem {
@@ -37,20 +37,20 @@ public class BillingSystem {
 	}
 
 	public String date() {
-	    return this.call.date();
+	    return call.date();
 	}
 
 	public String callee() {
-	    return this.call.callee();
+	    return call.callee();
 	}
 
 	// TODO Shall we abstract out the Formatter?
 	public String durationMinutes() {
-	    return "" + this.call.durationSeconds() / 60 + ":" + String.format("%02d", this.call.durationSeconds() % 60);
+	    return "" + call.durationSeconds() / 60 + ":" + String.format("%02d", call.durationSeconds() % 60);
 	}
 
 	public BigDecimal cost() {
-	    return this.callCost;
+	    return callCost;
 	}
     }
 }

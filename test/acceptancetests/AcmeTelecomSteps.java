@@ -5,8 +5,8 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.jbehave.core.annotations.AfterScenario;
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
@@ -59,28 +59,28 @@ public class AcmeTelecomSteps {
     private static final Logger LOG = LogManager.getLogger(AcmeTelecomSteps.class);
 
     public AcmeTelecomSteps() {
-	this.context = new JUnit4Mockery() {
+	context = new JUnit4Mockery() {
 	    {
-		this.setThreadingPolicy(new Synchroniser());
+		setThreadingPolicy(new Synchroniser());
 	    }
 	};
-	this.customerDatabase = this.context.mock(CustomerDatabase.class);
-	this.tariffLibrary = this.context.mock(TariffLibrary.class);
-	this.customers = Lists.newArrayList();
+	customerDatabase = context.mock(CustomerDatabase.class);
+	tariffLibrary = context.mock(TariffLibrary.class);
+	customers = Lists.newArrayList();
 
-	this.callLog = new ListCallLog();
-	this.tracker = new CallTracker(this.callLog);
-	this.printer = (FilePrinter) FilePrinter.getInstance();
-	this.generator = new BillGenerator(this.printer);
-	this.biller = new Biller(this.callLog, this.tariffLibrary, this.customerDatabase, this.generator);
-	this.billingSystem = new BillingSystem(this.biller, this.tracker);
+	callLog = new ListCallLog();
+	tracker = new CallTracker(callLog);
+	printer = (FilePrinter) FilePrinter.getInstance();
+	generator = new BillGenerator(printer);
+	biller = new Biller(callLog, tariffLibrary, customerDatabase, generator);
+	billingSystem = new BillingSystem(biller, tracker);
     }
 
     @AfterScenario
     public void cleanUp() {
-	this.printer.flush();
-	this.callLog.clearCompletedCalls();
-	this.customers.clear();
+	printer.flush();
+	callLog.clearCompletedCalls();
+	customers.clear();
     }
 
     /* -------------- GIVEN ---------------- */
@@ -88,19 +88,19 @@ public class AcmeTelecomSteps {
     @Given("users $users with $tariffType tariff exist in the database")
     public void given_user_exists(final List<String> users, final String tariffType) {
 	for (final String user : users) {
-	    this.customers.add(new Customer(user, String.valueOf(this.nextRandomPhoneNumber()), tariffType));
+	    customers.add(new Customer(user, String.valueOf(nextRandomPhoneNumber()), tariffType));
 	}
-	this.context.checking(new Expectations() {
+	context.checking(new Expectations() {
 	    {
-		this.allowing(AcmeTelecomSteps.this.customerDatabase).getCustomers();
-		this.will(returnValue(AcmeTelecomSteps.this.customers));
+		this.allowing(customerDatabase).getCustomers();
+		will(returnValue(customers));
 	    }
 	});
-	this.context.checking(new Expectations() {
+	context.checking(new Expectations() {
 	    {
-		for (final Customer customer : AcmeTelecomSteps.this.customers) {
-		    this.allowing(AcmeTelecomSteps.this.tariffLibrary).tarriffFor(customer);
-		    this.will(returnValue(Tariff.valueOf(customer.getPricePlan())));
+		for (final Customer customer : customers) {
+		    this.allowing(tariffLibrary).tarriffFor(customer);
+		    will(returnValue(Tariff.valueOf(customer.getPricePlan())));
 		}
 	    }
 	});
@@ -108,21 +108,21 @@ public class AcmeTelecomSteps {
 
     @Given("user $user1 called user $user2 for $seconds seconds")
     public void given_user_called_another_user(final String user1, final String user2, final int seconds) throws InterruptedException {
-	final String user1No = this.getUserNumber(user1);
-	final String user2No = this.getUserNumber(user2);
-	this.billingSystem.callInitiated(user1No, user2No);
+	final String user1No = getUserNumber(user1);
+	final String user2No = getUserNumber(user2);
+	billingSystem.callInitiated(user1No, user2No);
 	sleepSeconds(seconds);
-	this.billingSystem.callCompleted(user1No, user2No);
+	billingSystem.callCompleted(user1No, user2No);
     }
 
     @Given("user $user1 called user $user2 for $seconds seconds at $hour")
     public void given_user_called_another_user_at_hour(final String user1, final String user2, final int seconds, final String hour) {
-	final String user1No = this.getUserNumber(user1);
-	final String user2No = this.getUserNumber(user2);
+	final String user1No = getUserNumber(user1);
+	final String user2No = getUserNumber(user2);
 
-	final long startTime = new DateTime().withTimeAtStartOfDay().getMillis() + this.convertToHour(hour) * MILLIS_PER_HOUR;
+	final long startTime = new DateTime().withTimeAtStartOfDay().getMillis() + convertToHour(hour) * MILLIS_PER_HOUR;
 	final Call call = new Call(user1No, user2No, startTime, startTime + seconds * MILLIS_PER_SECOND);
-	this.callLog.addCall(call);
+	callLog.addCall(call);
     }
 
     @Given("user $user1 did not make any calls")
@@ -133,23 +133,23 @@ public class AcmeTelecomSteps {
 
     @When("all the bills are generated")
     public void when_the_bills_are_generated() {
-	this.billingSystem.createCustomerBills();
+	billingSystem.createCustomerBills();
     }
 
     @When("user $user1 calls user $user2")
     public void when_user_calls(final String user1, final String user2) throws InterruptedException {
-	final String user1No = this.getUserNumber(user1);
-	final String user2No = this.getUserNumber(user2);
+	final String user1No = getUserNumber(user1);
+	final String user2No = getUserNumber(user2);
 
-	this.billingSystem.callInitiated(user1No, user2No);
+	billingSystem.callInitiated(user1No, user2No);
     }
 
     /* -------------- THEN ---------------- */
 
     @Then("the bill for user $user contains $calls calls")
     public void then_the_bill_contains_calls(final String user, final int expectedCalls) {
-	final String userPattern = user + "/" + this.getUserNumber(user);
-	final Elements elements = Jsoup.parse(this.printer.getBill()).getElementsContainingOwnText(userPattern);
+	final String userPattern = user + "/" + getUserNumber(user);
+	final Elements elements = Jsoup.parse(printer.getBill()).getElementsContainingOwnText(userPattern);
 	int actualCalls = 0;
 	if (elements != null && elements.first() != null && elements.first().nextElementSibling() != null
 		&& elements.first().nextElementSibling().childNodeSize() > 1) {
@@ -165,12 +165,12 @@ public class AcmeTelecomSteps {
 
     @Then("the total for user $user is $expectedTotal")
     public void then_the_total_is(final String user, final double expectedTotal) {
-	final String userNo = this.getUserNumber(user);
-	final Elements elements = Jsoup.parse(this.printer.getBill()).getElementsContainingOwnText(userNo);
+	final String userNo = getUserNumber(user);
+	final Elements elements = Jsoup.parse(printer.getBill()).getElementsContainingOwnText(userNo);
 	double actualTotal = 0;
 	if (elements != null && elements.first() != null && elements.first().nextElementSibling() != null) {
 	    final String totalString = elements.first().nextElementSibling().nextElementSibling().text();
-	    actualTotal = this.retrieveDouble(totalString);
+	    actualTotal = retrieveDouble(totalString);
 	}
 	Assert.assertEquals(expectedTotal, actualTotal, 0.001);
     }
@@ -208,7 +208,7 @@ public class AcmeTelecomSteps {
     }
 
     private String getUserNumber(final String name) {
-	return Iterables.find(this.customers, new Predicate<Customer>() {
+	return Iterables.find(customers, new Predicate<Customer>() {
 	    @Override
 	    public boolean apply(final Customer c) {
 		return c.getFullName().equals(name);
