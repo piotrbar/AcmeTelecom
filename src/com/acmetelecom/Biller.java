@@ -5,6 +5,8 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.acmetelecom.BillingSystem.LineItem;
 import com.acmetelecom.customer.CentralCustomerDatabase;
 import com.acmetelecom.customer.CentralTariffDatabase;
@@ -14,23 +16,25 @@ import com.acmetelecom.customer.Tariff;
 import com.acmetelecom.customer.TariffLibrary;
 
 public class Biller {
+
     private final CallLog callLog;
     private final TariffLibrary tariffLibrary;
     private final CustomerDatabase customerDatabase;
     private final BillGenerator billGenerator;
+
+    @Autowired
+    public Biller(final CallLog callLog, final TariffLibrary tariffLibrary, final CustomerDatabase customerDatabase, final BillGenerator billGenerator) {
+	this.callLog = callLog;
+	this.tariffLibrary = tariffLibrary;
+	this.customerDatabase = customerDatabase;
+	this.billGenerator = billGenerator;
+    }
 
     public Biller(final CallLog callLog, final BillGenerator billGenerator) {
 	this.callLog = callLog;
 	this.billGenerator = billGenerator;
 	this.tariffLibrary = CentralTariffDatabase.getInstance();
 	this.customerDatabase = CentralCustomerDatabase.getInstance();
-    }
-
-    public Biller(final CallLog callLog, final TariffLibrary tariffLibrary, final CustomerDatabase customerDatabase, final BillGenerator billGenerator) {
-	this.callLog = callLog;
-	this.tariffLibrary = tariffLibrary;
-	this.customerDatabase = customerDatabase;
-	this.billGenerator = billGenerator;
     }
 
     public void createCustomerBills() {

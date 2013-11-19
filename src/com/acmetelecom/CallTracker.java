@@ -1,15 +1,19 @@
 package com.acmetelecom;
 
-import java.util.HashMap;
 import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.google.common.collect.Maps;
 
 public class CallTracker {
 
     private final Map<String, Call> activeCalls;
     private final CallLog callLog;
 
+    @Autowired
     public CallTracker(final CallLog callLog) {
-	this.activeCalls = new HashMap<String, Call>();
+	this.activeCalls = Maps.newHashMap();
 	this.callLog = callLog;
     }
 

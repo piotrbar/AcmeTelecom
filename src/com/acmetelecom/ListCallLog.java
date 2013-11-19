@@ -1,15 +1,16 @@
 package com.acmetelecom;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 public class ListCallLog implements CallLog {
     Map<String, List<Call>> callHistory;
 
     public ListCallLog() {
-	this.callHistory = new HashMap<String, List<Call>>();
+	this.callHistory = Maps.newHashMap();
     }
 
     @Override

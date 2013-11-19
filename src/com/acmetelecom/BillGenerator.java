@@ -2,6 +2,8 @@ package com.acmetelecom;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.acmetelecom.customer.Customer;
 
 public class BillGenerator {
@@ -14,6 +16,7 @@ public class BillGenerator {
      * @param printer
      *            The printer used to output the generated bill.
      */
+    @Autowired
     public BillGenerator(final Printer printer) {
 	super();
 	this.printer = printer;
@@ -27,17 +30,17 @@ public class BillGenerator {
      */
     @Deprecated
     public BillGenerator() {
-	printer = HtmlPrinter.getInstance();
+	this.printer = HtmlPrinter.getInstance();
     }
 
     // TODO this method should be renamed but stub left for legacy reasons?
     public void send(final Customer customer, final List<BillingSystem.LineItem> calls, final String totalBill) {
-	printer.printHeading(customer.getFullName(), customer.getPhoneNumber(), customer.getPricePlan());
+	this.printer.printHeading(customer.getFullName(), customer.getPhoneNumber(), customer.getPricePlan());
 	for (final BillingSystem.LineItem call : calls) {
-	    printer.printItem(call.date(), call.callee(), call.durationMinutes(), MoneyFormatter.penceToPounds(call.cost()));
+	    this.printer.printItem(call.date(), call.callee(), call.durationMinutes(), MoneyFormatter.penceToPounds(call.cost()));
 	    // TODO MoneyFromatter should be injected?
 	}
-	printer.printTotal(totalBill);
+	this.printer.printTotal(totalBill);
     }
 
 }
