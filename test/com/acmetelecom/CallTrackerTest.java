@@ -82,6 +82,11 @@ public class CallTrackerTest {
     }
 
     @Test
+    public void testCannotCallYourself() {
+	callTracker.callInitiated(caller, caller);
+    }
+
+    @Test
     public void testCallerInProgress() {
 	callTracker.callInitiated(caller, callee);
 	assertTrue(callTracker.callInProgress(caller));
