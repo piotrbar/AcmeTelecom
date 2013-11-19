@@ -45,12 +45,6 @@ public class CallTracker {
     }
 
     public Call callCompleted(final String caller, final String callee) throws IllegalCallException {
-	if (caller.equals(callee)) {
-	    final String errorMessage = String.format("User %s cannot complete a call to him/herself.", caller);
-	    LOG.error(errorMessage);
-	    throw new IllegalCallException(errorMessage);
-	}
-
 	final Call call = activeCalls.get(caller);
 	if (call == null || !call.callee().equals(callee)) {
 	    final String errorMessage = String.format("User %s has not initiated a call with %s.", caller, callee);

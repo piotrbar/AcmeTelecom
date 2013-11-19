@@ -10,12 +10,15 @@ import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.acmetelecom.exceptions.IllegalCallException;
+
 public class CallTrackerTest {
     private final Mockery context = new Mockery();
     private final CallLog callLog = context.mock(CallLog.class);
     private CallTracker callTracker = null;
 
     private final String caller = "1234";
+    private final String caller2 = "1235";
     private final String callee = "5678";
 
     @Before
@@ -24,7 +27,7 @@ public class CallTrackerTest {
     }
 
     @Test
-    public void testInitiatingCall() {
+    public void testInitiatingCall() throws IllegalCallException {
 	final Call initiatedCall = callTracker.callInitiated(caller, callee);
 
 	assertEquals(initiatedCall.caller(), caller);
@@ -34,7 +37,7 @@ public class CallTrackerTest {
     }
 
     @Test
-    public void testCompletingCall() {
+    public void testCompletingCall() throws IllegalCallException {
 	final Call initiatedCall = callTracker.callInitiated(caller, callee);
 
 	context.checking(new Expectations() {
@@ -52,7 +55,7 @@ public class CallTrackerTest {
     }
 
     @Test
-    public void testCantRecompleteCall() {
+    public void testCantRecompleteCall() throws IllegalCallException {
 	final Call call = callTracker.callInitiated(caller, callee);
 	context.checking(new Expectations() {
 	    {
@@ -68,26 +71,30 @@ public class CallTrackerTest {
 	assertNull(callTracker.callCompleted(caller, callee));
     }
 
-    @Test
-    public void testCantCompleteNeverInitiatedCall() {
-	final Call call = callTracker.callCompleted(caller, callee);
-	assertNull(call);
+    @Test(expected = IllegalCallException.class)
+    public void testCantCompleteNeverInitiatedCall() throws IllegalCallException {
+	callTracker.callCompleted(caller, callee);
     }
 
-    @Test
-    public void testOnlyOneActiveCallPerUser() {
+    @Test(expected = IllegalCallException.class)
+    public void testOnlyOneActiveCallPerUser() throws IllegalCallException {
 	callTracker.callInitiated(caller, callee);
-	final Call call = callTracker.callInitiated(caller, callee);
-	assertNull(call);
+	callTracker.callInitiated(caller, callee);
     }
 
-    @Test
-    public void testCannotCallYourself() {
+    @Test(expected = IllegalCallException.class)
+    public void testOnlyOneActiveCallPerCallee() throws IllegalCallException {
+	callTracker.callInitiated(caller, callee);
+	callTracker.callInitiated(caller2, callee);
+    }
+
+    @Test(expected = IllegalCallException.class)
+    public void testCannotCallYourself() throws IllegalCallException {
 	callTracker.callInitiated(caller, caller);
     }
 
     @Test
-    public void testCallerInProgress() {
+    public void testCallerInProgress() throws IllegalCallException {
 	callTracker.callInitiated(caller, callee);
 	assertTrue(callTracker.callInProgress(caller));
     }
@@ -98,7 +105,7 @@ public class CallTrackerTest {
     }
 
     @Test
-    public void testCompletedCallerNotInProgress() {
+    public void testCompletedCallerNotInProgress() throws IllegalCallException {
 	callTracker.callInitiated(caller, callee);
 	context.checking(new Expectations() {
 	    {
