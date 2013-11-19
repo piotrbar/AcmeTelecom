@@ -13,30 +13,37 @@ public class CallTracker {
 
     @Autowired
     public CallTracker(final CallLog callLog) {
-	this.activeCalls = Maps.newHashMap();
+	activeCalls = Maps.newHashMap();
 	this.callLog = callLog;
     }
 
-    public void callInitiated(final String caller, final String callee) {
-	if (!this.callInProgress(caller)) {
-	    this.activeCalls.put(caller, new Call(caller, callee, System.currentTimeMillis()));
+    public Call callInitiated(final String caller, final String callee) {
+	Call call = null;
+	if (!callInProgress(caller)) {
+	    call = new Call(caller, callee, System.currentTimeMillis());
+	    activeCalls.put(caller, call);
 	} else {
 	    // TODO
 	}
+
+	return call;
     }
 
     public boolean callInProgress(final String caller) {
-	return this.activeCalls.containsKey(caller);
+	return activeCalls.containsKey(caller);
     }
 
-    public void callCompleted(final String caller, final String callee) {
-	final Call call = this.activeCalls.get(caller);
+    public Call callCompleted(final String caller, final String callee) {
+	final Call call = activeCalls.get(caller);
 	if (call != null && call.callee().equals(callee)) {
 	    call.completed(System.currentTimeMillis());
-	    this.callLog.addCall(call);
-	    this.activeCalls.remove(caller);
+	    callLog.addCall(call);
+	    activeCalls.remove(caller);
+	    return call;
 	} else {
 	    // TODO
+	    return null;
 	}
+
     }
 }
