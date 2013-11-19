@@ -37,16 +37,17 @@ public class CallTracker {
 
 	final Call call = new Call(caller, callee, System.currentTimeMillis());
 	activeCalls.put(caller, call);
+	activeCalls.put(callee, call);
 	return call;
     }
 
-    public boolean callInProgress(final String caller) {
-	return activeCalls.containsKey(caller);
+    public boolean callInProgress(final String user) {
+	return activeCalls.containsKey(user);
     }
 
     public Call callCompleted(final String caller, final String callee) throws IllegalCallException {
 	final Call call = activeCalls.get(caller);
-	if (call == null || !call.callee().equals(callee)) {
+	if (call == null || !call.callee().equals(callee) || !call.caller().equals(caller)) {
 	    final String errorMessage = String.format("User %s has not initiated a call with %s.", caller, callee);
 	    LOG.error(errorMessage);
 	    throw new IllegalCallException(errorMessage);
@@ -55,6 +56,7 @@ public class CallTracker {
 	call.completed(System.currentTimeMillis());
 	callLog.addCall(call);
 	activeCalls.remove(caller);
+	activeCalls.remove(callee);
 	return call;
     }
 }

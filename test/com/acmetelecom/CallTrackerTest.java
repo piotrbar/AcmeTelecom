@@ -2,7 +2,6 @@ package com.acmetelecom;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.jmock.Expectations;
@@ -54,7 +53,7 @@ public class CallTrackerTest {
 	assertTrue(callCompletedBeforeNow);
     }
 
-    @Test
+    @Test(expected = IllegalCallException.class)
     public void testCantRecompleteCall() throws IllegalCallException {
 	final Call call = callTracker.callInitiated(caller, callee);
 	context.checking(new Expectations() {
@@ -68,7 +67,7 @@ public class CallTrackerTest {
 		never(callLog).addCall(call);
 	    }
 	});
-	assertNull(callTracker.callCompleted(caller, callee));
+	callTracker.callCompleted(caller, callee);
     }
 
     @Test(expected = IllegalCallException.class)
