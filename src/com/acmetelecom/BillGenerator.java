@@ -18,7 +18,6 @@ public class BillGenerator {
      */
     @Autowired
     public BillGenerator(final Printer printer) {
-	super();
 	this.printer = printer;
     }
 
@@ -30,17 +29,17 @@ public class BillGenerator {
      */
     @Deprecated
     public BillGenerator() {
-	this.printer = HtmlPrinter.getInstance();
+	printer = HtmlPrinter.getInstance();
     }
 
     // TODO this method should be renamed but stub left for legacy reasons?
     public void send(final Customer customer, final List<BillingSystem.LineItem> calls, final String totalBill) {
-	this.printer.printHeading(customer.getFullName(), customer.getPhoneNumber(), customer.getPricePlan());
+	printer.printHeading(customer.getFullName(), customer.getPhoneNumber(), customer.getPricePlan());
 	for (final BillingSystem.LineItem call : calls) {
-	    this.printer.printItem(call.date(), call.callee(), call.durationMinutes(), MoneyFormatter.penceToPounds(call.cost()));
+	    printer.printItem(call.date(), call.callee(), call.durationMinutes(), MoneyFormatter.penceToPounds(call.cost()));
 	    // TODO MoneyFromatter should be injected?
 	}
-	this.printer.printTotal(totalBill);
+	printer.printTotal(totalBill);
     }
 
 }

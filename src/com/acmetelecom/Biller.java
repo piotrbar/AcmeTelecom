@@ -33,27 +33,27 @@ public class Biller {
     public Biller(final CallLog callLog, final BillGenerator billGenerator) {
 	this.callLog = callLog;
 	this.billGenerator = billGenerator;
-	this.tariffLibrary = CentralTariffDatabase.getInstance();
-	this.customerDatabase = CentralCustomerDatabase.getInstance();
+	tariffLibrary = CentralTariffDatabase.getInstance();
+	customerDatabase = CentralCustomerDatabase.getInstance();
     }
 
     public void createCustomerBills() {
-	final List<Customer> customers = this.customerDatabase.getCustomers();
+	final List<Customer> customers = customerDatabase.getCustomers();
 	for (final Customer customer : customers) {
-	    this.createBillFor(customer);
+	    createBillFor(customer);
 	}
-	this.callLog.clearCompletedCalls();
+	callLog.clearCompletedCalls();
     }
 
     private void createBillFor(final Customer customer) {
-	final Iterable<Call> calls = this.callLog.getCallsForCustomer(customer.getPhoneNumber());
+	final Iterable<Call> calls = callLog.getCallsForCustomer(customer.getPhoneNumber());
 
 	BigDecimal totalBill = new BigDecimal(0);
 	final List<LineItem> items = new ArrayList<LineItem>();
 
 	for (final Call call : calls) {
 
-	    final Tariff tariff = this.tariffLibrary.tarriffFor(customer);
+	    final Tariff tariff = tariffLibrary.tarriffFor(customer);
 
 	    BigDecimal cost;
 
@@ -71,6 +71,6 @@ public class Biller {
 	    items.add(new LineItem(call, callCost));
 	}
 
-	this.billGenerator.send(customer, items, MoneyFormatter.penceToPounds(totalBill));
+	billGenerator.send(customer, items, MoneyFormatter.penceToPounds(totalBill));
     }
 }

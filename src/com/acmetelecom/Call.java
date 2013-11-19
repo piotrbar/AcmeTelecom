@@ -19,7 +19,7 @@ public class Call {
 	this.caller = caller;
 	this.callee = callee;
 	this.timeStart = timeStart;
-	this.timeEnd = null;
+	timeEnd = null;
     }
 
     /**
@@ -30,10 +30,10 @@ public class Call {
 	assert (start.getCaller().equals(end.getCaller()));
 	assert (start.getCallee().equals(end.getCallee()));
 
-	this.caller = start.getCaller();
-	this.callee = start.getCallee();
-	this.timeStart = start.time();
-	this.timeEnd = end.time();
+	caller = start.getCaller();
+	callee = start.getCallee();
+	timeStart = start.time();
+	timeEnd = end.time();
     }
 
     public Call(final String caller, final String callee, final long timeStart, final long timeEnd) {
@@ -44,27 +44,27 @@ public class Call {
     }
 
     public String caller() {
-	return this.caller;
+	return caller;
     }
 
     public String callee() {
-	return this.callee;
+	return callee;
     }
 
     public int durationSeconds() {
-	return (int) (((this.timeEnd - this.timeStart) / 1000));
+	return (int) (((timeEnd - timeStart) / 1000));
     }
 
     public String date() {
-	return SimpleDateFormat.getInstance().format(new Date(this.timeStart));
+	return SimpleDateFormat.getInstance().format(new Date(timeStart));
     }
 
     public Date startTime() {
-	return new Date(this.timeStart);
+	return new Date(timeStart);
     }
 
     public Date endTime() {
-	return new Date(this.timeEnd);
+	return new Date(timeEnd);
     }
 
     public void completed(final long timeEnd) {

@@ -1,6 +1,5 @@
 package com.acmetelecom;
 
-
 public interface CallLog {
     public void addCall(final Call c);
 
