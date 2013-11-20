@@ -7,6 +7,8 @@ import org.joda.time.Seconds;
 
 class DaytimePeakPeriod {
 
+    private static final int secondsInADay = 24 * 60 * 60;
+
     // TODO So far we only allow the peak period to start and finish at full
     // hours
     private final int peakStart;
@@ -34,11 +36,11 @@ class DaytimePeakPeriod {
 	return hour < peakStart || hour >= peakEnd;
     }
 
-    public int offPeakSeconds() {
+    public int getOffPeakSecondsInADay() {
 	return offPeakSeconds;
     }
 
-    public int peakSeconds() {
+    public int getPeakSecondsInADay() {
 	return (24 * 60 * 60) - offPeakSeconds;
     }
 
@@ -51,12 +53,28 @@ class DaytimePeakPeriod {
      */
     public int getPeakSeconds(final DateTime startTime, final DateTime endTime) {
 
+	Interval interval = new Interval(startTime, endTime);
+	int peakSeconds = 0;
+
+	while (interval.toDuration().getStandardSeconds() > secondsInADay) {
+	    peakSeconds += getPeakSecondsInADay();
+	    endTime.minusDays(1);
+	    interval = new Interval(startTime, endTime);
+	}
+
+	peakSeconds += getPeakSeconds24(startTime, endTime);
+
+	return peakSeconds;
+
+    }
+
+    private int getPeakSeconds24(final DateTime startTime, final DateTime endTime) {
 	// Case 1: Both times are within off peak periods
 	if (offPeak(startTime) && offPeak(endTime)) {
 	    if (endTime.isBefore(getStartOfPeak(startTime))) {
 		return 0;
 	    } else {
-		return peakSeconds();
+		return getPeakSecondsInADay();
 	    }
 	}
 	// Case 2: The first time is off peak and the second is peak
