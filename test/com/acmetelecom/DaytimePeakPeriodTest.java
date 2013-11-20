@@ -3,9 +3,9 @@ package com.acmetelecom;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Date;
 import java.util.TimeZone;
 
+import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,9 +30,13 @@ public class DaytimePeakPeriodTest {
 	for (final String zone : zones) {
 	    TimeZone.setDefault(TimeZone.getTimeZone(zone));
 
-	    final Date timePeak = new Date(2013, 11, 12, 8, 10, 10); // Inside the peak
-	    final Date timeOffPeakEarly = new Date(2013, 11, 12, 6, 10, 10); // Before peak
-	    final Date timeOffPeakLate = new Date(2013, 11, 12, 20, 10, 10); // After peak
+	    final DateTime timePeak = new DateTime(2013, 11, 12, 8, 10, 10); // Inside
+									     // the
+									     // peak
+	    final DateTime timeOffPeakEarly = new DateTime(2013, 11, 12, 6, 10, 10); // Before
+										     // peak
+	    final DateTime timeOffPeakLate = new DateTime(2013, 11, 12, 20, 10, 10); // After
+										     // peak
 
 	    assertFalse(period.offPeak(timePeak));
 	    assertTrue(period.offPeak(timeOffPeakEarly));

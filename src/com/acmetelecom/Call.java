@@ -1,7 +1,8 @@
 package com.acmetelecom;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 // TODO There should be a factory or builder to create those calls with a meaningful fluid interface call. 
 // The constructor parameters are super difficult to understand
@@ -56,15 +57,16 @@ public class Call {
     }
 
     public String date() {
-	return SimpleDateFormat.getInstance().format(new Date(timeStart));
+	final DateTimeFormatter dtf = DateTimeFormat.shortDateTime();
+	return new DateTime(timeStart).toString(dtf);
     }
 
-    public Date startTime() {
-	return new Date(timeStart);
+    public DateTime startTime() {
+	return new DateTime(timeStart);
     }
 
-    public Date endTime() {
-	return new Date(timeEnd);
+    public DateTime endTime() {
+	return new DateTime(timeEnd);
     }
 
     public void completed(final long timeEnd) {

@@ -21,18 +21,22 @@ public class Biller {
     private final TariffLibrary tariffLibrary;
     private final CustomerDatabase customerDatabase;
     private final BillGenerator billGenerator;
+    private final CallCostCalculator callCostCalculator;
 
     @Autowired
-    public Biller(final CallLog callLog, final TariffLibrary tariffLibrary, final CustomerDatabase customerDatabase, final BillGenerator billGenerator) {
+    public Biller(final CallLog callLog, final TariffLibrary tariffLibrary, final CustomerDatabase customerDatabase, final BillGenerator billGenerator,
+	    final CallCostCalculator callCostCalculator) {
 	this.callLog = callLog;
 	this.tariffLibrary = tariffLibrary;
 	this.customerDatabase = customerDatabase;
 	this.billGenerator = billGenerator;
+	this.callCostCalculator = callCostCalculator;
     }
 
-    public Biller(final CallLog callLog, final BillGenerator billGenerator) {
+    public Biller(final CallLog callLog, final BillGenerator billGenerator, final CallCostCalculator callCostCalculator) {
 	this.callLog = callLog;
 	this.billGenerator = billGenerator;
+	this.callCostCalculator = callCostCalculator;
 	tariffLibrary = CentralTariffDatabase.getInstance();
 	customerDatabase = CentralCustomerDatabase.getInstance();
     }
@@ -55,15 +59,7 @@ public class Biller {
 
 	    final Tariff tariff = tariffLibrary.tarriffFor(customer);
 
-	    BigDecimal cost;
-
-	    final DaytimePeakPeriod peakPeriod = new DaytimePeakPeriod();
-	    // TODO Why does the call have to be less than 12hrs?
-	    if (peakPeriod.offPeak(call.startTime()) && peakPeriod.offPeak(call.endTime()) && call.durationSeconds() < 12 * 60 * 60) {
-		cost = new BigDecimal(call.durationSeconds()).multiply(tariff.offPeakRate());
-	    } else {
-		cost = new BigDecimal(call.durationSeconds()).multiply(tariff.peakRate());
-	    }
+	    BigDecimal cost = callCostCalculator.calculate(call, tariff);
 
 	    cost = cost.setScale(0, RoundingMode.HALF_UP);
 	    final BigDecimal callCost = cost;
