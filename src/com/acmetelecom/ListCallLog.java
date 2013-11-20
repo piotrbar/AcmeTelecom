@@ -29,7 +29,7 @@ public class ListCallLog implements CallLog {
     }
 
     @Override
-    public Iterable<Call> getCallsForCustomer(final String caller) {
+    public List<Call> getCallsForCustomer(final String caller) {
 	if (callHistory.containsKey(caller)) {
 	    return callHistory.get(caller);
 	} else {

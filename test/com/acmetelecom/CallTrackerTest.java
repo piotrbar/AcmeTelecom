@@ -31,7 +31,7 @@ public class CallTrackerTest {
 
 	assertEquals(initiatedCall.caller(), caller);
 	assertEquals(initiatedCall.callee(), callee);
-	final boolean callStartedBeforeNow = initiatedCall.startTime().getTime() <= System.currentTimeMillis();
+	final boolean callStartedBeforeNow = initiatedCall.startTime() <= System.currentTimeMillis();
 	assertTrue(callStartedBeforeNow);
     }
 
@@ -49,7 +49,7 @@ public class CallTrackerTest {
 
 	assertEquals(completedCall.callee(), completedCall.callee());
 	assertEquals(completedCall.caller(), completedCall.caller());
-	final boolean callCompletedBeforeNow = completedCall.endTime().getTime() <= System.currentTimeMillis();
+	final boolean callCompletedBeforeNow = completedCall.endTime() <= System.currentTimeMillis();
 	assertTrue(callCompletedBeforeNow);
     }
 

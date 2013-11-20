@@ -65,13 +65,13 @@ public class CallTest {
     @Test
     public void testStartTime() {
 	final Call call = new Call(start, end);
-	assertEquals(startTime, call.startTime().getTime());
+	assertEquals(startTime, call.startTime());
     }
 
     @Test
     public void testEndTime() {
 	final Call call = new Call(start, end);
-	assertEquals(endTime, call.endTime().getTime());
+	assertEquals(endTime, call.endTime());
     }
 
 }

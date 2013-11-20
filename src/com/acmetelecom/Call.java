@@ -62,12 +62,12 @@ public class Call {
 	return new DateTime(timeStart).toString(dtf);
     }
 
-    public DateTime startTime() {
-	return new DateTime(timeStart);
+    public long startTime() {
+	return timeStart;
     }
 
-    public DateTime endTime() {
-	return new DateTime(timeEnd);
+    public long endTime() {
+	return timeEnd;
     }
 
     public void completed(final long timeEnd) {

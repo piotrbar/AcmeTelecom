@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.acmetelecom.BillingSystem.LineItem;
@@ -59,7 +60,7 @@ public class Biller {
 
 	    final DaytimePeakPeriod peakPeriod = new DaytimePeakPeriod();
 
-	    final int noOfPeakSeconds = peakPeriod.getPeakSeconds(call.startTime(), call.endTime());
+	    final int noOfPeakSeconds = peakPeriod.getPeakSeconds(new DateTime(call.startTime()), new DateTime(call.endTime()));
 
 	    final BigDecimal peakCost = new BigDecimal(noOfPeakSeconds).multiply(tariff.peakRate());
 	    final BigDecimal offPeakCost = new BigDecimal(call.durationSeconds() - noOfPeakSeconds).multiply(tariff.offPeakRate());

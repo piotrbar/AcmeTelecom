@@ -40,14 +40,14 @@ public class ListCallLogTest {
 
     @Test
     public void testClearCompletedCalls() {
-	assertTrue(test.getCalls(caller1).size() > 0);
-	assertTrue(test.getCalls(caller2).size() > 0);
+	assertTrue(test.getCallsForCustomer(caller1).size() > 0);
+	assertTrue(test.getCallsForCustomer(caller2).size() > 0);
 
 	// Clear the call log
 	test.clearCompletedCalls();
 
-	assertEquals(0, test.getCalls(caller1).size());
-	assertEquals(0, test.getCalls(caller2).size());
+	assertEquals(0, test.getCallsForCustomer(caller1).size());
+	assertEquals(0, test.getCallsForCustomer(caller2).size());
     }
 
     @Test
@@ -62,13 +62,13 @@ public class ListCallLogTest {
 	test.addCall(c1);
 	test.addCall(c2);
 
-	assertEquals(caller1Calls + 1, test.getCalls(caller1).size());
-	assertEquals(caller2Calls + 1, test.getCalls(caller2).size());
+	assertEquals(caller1Calls + 1, test.getCallsForCustomer(caller1).size());
+	assertEquals(caller2Calls + 1, test.getCallsForCustomer(caller2).size());
     }
 
     @Test
     public void testGetCalls() {
-	assertEquals(caller1Calls, test.getCalls(caller1).size());
-	assertEquals(caller2Calls, test.getCalls(caller2).size());
+	assertEquals(caller1Calls, test.getCallsForCustomer(caller1).size());
+	assertEquals(caller2Calls, test.getCallsForCustomer(caller2).size());
     }
 }
