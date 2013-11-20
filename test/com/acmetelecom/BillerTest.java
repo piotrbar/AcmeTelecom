@@ -187,16 +187,27 @@ public class BillerTest {
 	// 6am to 8pm = 14hr long
 	callLog.addCall(new Call(customers.get(2).getPhoneNumber(), "mother", hourLength * 6, hourLength * 20));
 
+	final BigDecimal oneHoursInSeconds = new BigDecimal(1 * 60 * 60);
 	final BigDecimal twoHoursInSeconds = new BigDecimal(2 * 60 * 60);
-	final BigDecimal fourteenHoursInSeconds = new BigDecimal(14 * 60 * 60);
+	final BigDecimal twelveHoursInSeconds = new BigDecimal(12 * 60 * 60);
+
 	context.checking(new Expectations() {
 	    {
-		this.oneOf(billGenerator).send(this.with(equal(customers.get(0))), this.with(any(List.class)),
-			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Business.peakRate().multiply(twoHoursInSeconds)))));
-		this.oneOf(billGenerator).send(this.with(equal(customers.get(1))), this.with(any(List.class)),
-			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Leisure.peakRate().multiply(twoHoursInSeconds)))));
-		this.oneOf(billGenerator).send(this.with(equal(customers.get(2))), this.with(any(List.class)),
-			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Standard.peakRate().multiply(fourteenHoursInSeconds)))));
+		this.oneOf(billGenerator).send(
+			this.with(equal(customers.get(0))),
+			this.with(any(List.class)),
+			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Business.peakRate().multiply(oneHoursInSeconds)
+				.add(Tariff.Business.offPeakRate().multiply(oneHoursInSeconds))))));
+		this.oneOf(billGenerator).send(
+			this.with(equal(customers.get(1))),
+			this.with(any(List.class)),
+			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Leisure.peakRate().multiply(oneHoursInSeconds)
+				.add(Tariff.Leisure.offPeakRate().multiply(oneHoursInSeconds))))));
+		this.oneOf(billGenerator).send(
+			this.with(equal(customers.get(2))),
+			this.with(any(List.class)),
+			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Standard.peakRate().multiply(twelveHoursInSeconds)
+				.add(Tariff.Standard.offPeakRate().multiply(twoHoursInSeconds))))));
 	    }
 	});
 
