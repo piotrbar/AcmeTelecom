@@ -2,6 +2,8 @@ package com.acmetelecom;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.acmetelecom.customer.Customer;
 
 public class BillGenerator {
@@ -14,8 +16,8 @@ public class BillGenerator {
      * @param printer
      *            The printer used to output the generated bill.
      */
+    @Autowired
     public BillGenerator(final Printer printer) {
-	super();
 	this.printer = printer;
     }
 

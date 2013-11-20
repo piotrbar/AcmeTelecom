@@ -5,21 +5,40 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.acmetelecom.BillingSystem.LineItem;
 import com.acmetelecom.customer.CentralCustomerDatabase;
 import com.acmetelecom.customer.CentralTariffDatabase;
 import com.acmetelecom.customer.Customer;
+import com.acmetelecom.customer.CustomerDatabase;
 import com.acmetelecom.customer.Tariff;
+import com.acmetelecom.customer.TariffLibrary;
 
 public class Biller {
-    private final CallLog callLog;
 
-    public Biller(final CallLog callLog) {
+    private final CallLog callLog;
+    private final TariffLibrary tariffLibrary;
+    private final CustomerDatabase customerDatabase;
+    private final BillGenerator billGenerator;
+
+    @Autowired
+    public Biller(final CallLog callLog, final TariffLibrary tariffLibrary, final CustomerDatabase customerDatabase, final BillGenerator billGenerator) {
 	this.callLog = callLog;
+	this.tariffLibrary = tariffLibrary;
+	this.customerDatabase = customerDatabase;
+	this.billGenerator = billGenerator;
+    }
+
+    public Biller(final CallLog callLog, final BillGenerator billGenerator) {
+	this.callLog = callLog;
+	this.billGenerator = billGenerator;
+	tariffLibrary = CentralTariffDatabase.getInstance();
+	customerDatabase = CentralCustomerDatabase.getInstance();
     }
 
     public void createCustomerBills() {
-	final List<Customer> customers = CentralCustomerDatabase.getInstance().getCustomers();
+	final List<Customer> customers = customerDatabase.getCustomers();
 	for (final Customer customer : customers) {
 	    createBillFor(customer);
 	}
@@ -27,43 +46,25 @@ public class Biller {
     }
 
     private void createBillFor(final Customer customer) {
-	// final List<CallEvent> customerEvents = new ArrayList<CallEvent>();
-	// for (final CallEvent callEvent : callLog.getCallEvents()) {
-	// if (callEvent.getCaller().equals(customer.getPhoneNumber())) {
-	// customerEvents.add(callEvent);
-	// }
-	// }
-	//
-	// final List<Call> calls = new ArrayList<Call>();
-	//
-	// CallEvent start = null;
-	// for (final CallEvent event : customerEvents) {
-	// if (event instanceof CallStart) {
-	// start = event;
-	// }
-	// if (event instanceof CallEnd && start != null) {
-	// calls.add(new Call(start, event));
-	// start = null;
-	// }
-	// }
-
-	final List<Call> calls = callLog.getCalls(customer.getPhoneNumber());
+	final Iterable<Call> calls = callLog.getCallsForCustomer(customer.getPhoneNumber());
 
 	BigDecimal totalBill = new BigDecimal(0);
 	final List<LineItem> items = new ArrayList<LineItem>();
 
 	for (final Call call : calls) {
 
-	    final Tariff tariff = CentralTariffDatabase.getInstance().tarriffFor(customer);
+	    final Tariff tariff = tariffLibrary.tarriffFor(customer);
 
 	    BigDecimal cost;
 
 	    final DaytimePeakPeriod peakPeriod = new DaytimePeakPeriod();
-	    if (peakPeriod.offPeak(call.startTime()) && peakPeriod.offPeak(call.endTime()) && call.durationSeconds() < 12 * 60 * 60) {
-		cost = new BigDecimal(call.durationSeconds()).multiply(tariff.offPeakRate());
-	    } else {
-		cost = new BigDecimal(call.durationSeconds()).multiply(tariff.peakRate());
-	    }
+
+	    final int noOfPeakSeconds = peakPeriod.getPeakSeconds(call.startTime(), call.endTime());
+
+	    final BigDecimal peakCost = new BigDecimal(noOfPeakSeconds).multiply(tariff.peakRate());
+	    final BigDecimal offPeakCost = new BigDecimal(call.durationSeconds() - noOfPeakSeconds).multiply(tariff.offPeakRate());
+
+	    cost = peakCost.add(offPeakCost);
 
 	    cost = cost.setScale(0, RoundingMode.HALF_UP);
 	    final BigDecimal callCost = cost;
@@ -71,6 +72,6 @@ public class Biller {
 	    items.add(new LineItem(call, callCost));
 	}
 
-	new BillGenerator().send(customer, items, MoneyFormatter.penceToPounds(totalBill));
+	billGenerator.send(customer, items, MoneyFormatter.penceToPounds(totalBill));
     }
 }

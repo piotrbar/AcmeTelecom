@@ -1,36 +1,39 @@
 package com.acmetelecom;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class ListCallLog implements CallLog {
+import com.google.common.collect.Maps;
 
-    private final Map<String, List<Call>> callHistory;
+public class ListCallLog implements CallLog {
+    Map<String, List<Call>> callHistory;
 
     public ListCallLog() {
-	this.callHistory = new HashMap<String, List<Call>>();
+	callHistory = Maps.newHashMap();
     }
 
     @Override
     public void clearCompletedCalls() {
-	this.callHistory.clear();
+	callHistory.clear();
     }
 
     @Override
     public void addCall(final Call c) {
-	List<Call> callerHistory = this.callHistory.get(c.caller());
+	List<Call> callerHistory = callHistory.get(c.caller());
 	if (callerHistory == null) {
 	    callerHistory = new LinkedList<Call>();
 	}
 	callerHistory.add(c);
-	this.callHistory.put(c.caller(), callerHistory);
+	callHistory.put(c.caller(), callerHistory);
     }
 
     @Override
-    public List<Call> getCalls(final String caller) {
-	return this.callHistory.get(caller);
+    public Iterable<Call> getCallsForCustomer(final String caller) {
+	if (callHistory.containsKey(caller)) {
+	    return callHistory.get(caller);
+	} else {
+	    return new LinkedList<Call>();
+	}
     }
-
 }

@@ -1,25 +1,25 @@
 package com.acmetelecom;
 
 public abstract class CallEvent {
-    private String caller;
-    private String callee;
-    private long time;
+    private final String caller;
+    private final String callee;
+    private final long time;
 
-    public CallEvent(String caller, String callee, long timeStamp) {
-        this.caller = caller;
-        this.callee = callee;
-        this.time = timeStamp;
+    public CallEvent(final String caller, final String callee, final long timeStamp) {
+	this.caller = caller;
+	this.callee = callee;
+	time = timeStamp;
     }
 
     public String getCaller() {
-        return caller;
+	return caller;
     }
 
     public String getCallee() {
-        return callee;
+	return callee;
     }
 
     public long time() {
-        return time;
+	return time;
     }
 }

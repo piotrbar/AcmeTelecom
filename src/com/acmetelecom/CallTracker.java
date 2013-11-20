@@ -1,38 +1,62 @@
 package com.acmetelecom;
 
-import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.acmetelecom.exceptions.IllegalCallException;
+import com.google.common.collect.Maps;
 
 public class CallTracker {
 
     private final Map<String, Call> activeCalls;
     private final CallLog callLog;
 
+    private static final Logger LOG = LogManager.getLogger(CallTracker.class);
+
+    @Autowired
     public CallTracker(final CallLog callLog) {
-	this.activeCalls = new HashMap<String, Call>();
+	activeCalls = Maps.newHashMap();
 	this.callLog = callLog;
     }
 
-    public void callInitiated(final String caller, final String callee) {
-	if (!this.callInProgress(caller)) {
-	    this.activeCalls.put(caller, new Call(caller, callee, System.currentTimeMillis()));
-	} else {
-	    // TODO
+    public Call callInitiated(final String caller, final String callee) throws IllegalCallException {
+	if (caller.equals(callee)) {
+	    final String errorMessage = String.format("User %s cannot initiate a call to him/herself.", caller);
+	    LOG.error(errorMessage);
+	    throw new IllegalCallException(errorMessage);
 	}
+
+	if (callInProgress(caller) || callInProgress(callee)) {
+	    final String errorMessage = String.format("One of the users: %s, %s is in the busy state.", caller, callee);
+	    LOG.error(errorMessage);
+	    throw new IllegalCallException(errorMessage);
+	}
+
+	final Call call = new Call(caller, callee, System.currentTimeMillis());
+	activeCalls.put(caller, call);
+	activeCalls.put(callee, call);
+	return call;
     }
 
-    public boolean callInProgress(final String caller) {
-	return this.activeCalls.containsKey(caller);
+    public boolean callInProgress(final String user) {
+	return activeCalls.containsKey(user);
     }
 
-    public void callCompleted(final String caller, final String callee) {
-	final Call call = this.activeCalls.get(caller);
-	if (call != null && call.callee().equals(callee)) {
-	    call.completed(System.currentTimeMillis());
-	    this.callLog.addCall(call);
-	    this.activeCalls.remove(caller);
-	} else {
-	    // TODO
+    public Call callCompleted(final String caller, final String callee) throws IllegalCallException {
+	final Call call = activeCalls.get(caller);
+	if (call == null || !call.callee().equals(callee) || !call.caller().equals(caller)) {
+	    final String errorMessage = String.format("User %s has not initiated a call with %s.", caller, callee);
+	    LOG.error(errorMessage);
+	    throw new IllegalCallException(errorMessage);
 	}
+
+	call.completed(System.currentTimeMillis());
+	callLog.addCall(call);
+	activeCalls.remove(caller);
+	activeCalls.remove(callee);
+	return call;
     }
 }

@@ -1,8 +1,11 @@
 package com.acmetelecom;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
+// TODO There should be a factory or builder to create those calls with a meaningful fluid interface call. 
+// The constructor parameters are super difficult to understand
 public class Call {
 
     private final String caller;
@@ -18,7 +21,7 @@ public class Call {
 	this.caller = caller;
 	this.callee = callee;
 	this.timeStart = timeStart;
-	this.timeEnd = null;
+	timeEnd = null;
     }
 
     /**
@@ -29,34 +32,42 @@ public class Call {
 	assert (start.getCaller().equals(end.getCaller()));
 	assert (start.getCallee().equals(end.getCallee()));
 
-	this.caller = start.getCaller();
-	this.callee = start.getCallee();
-	this.timeStart = start.time();
-	this.timeEnd = end.time();
+	caller = start.getCaller();
+	callee = start.getCallee();
+	timeStart = start.time();
+	timeEnd = end.time();
+    }
+
+    public Call(final String caller, final String callee, final long timeStart, final long timeEnd) {
+	this.caller = caller;
+	this.callee = callee;
+	this.timeStart = timeStart;
+	this.timeEnd = timeEnd;
     }
 
     public String caller() {
-	return this.caller;
+	return caller;
     }
 
     public String callee() {
-	return this.callee;
+	return callee;
     }
 
     public int durationSeconds() {
-	return (int) (((this.timeEnd - this.timeStart) / 1000));
+	return (int) (((timeEnd - timeStart) / 1000));
     }
 
     public String date() {
-	return SimpleDateFormat.getInstance().format(new Date(this.timeStart));
+	final DateTimeFormatter dtf = DateTimeFormat.shortDateTime();
+	return new DateTime(timeStart).toString(dtf);
     }
 
-    public Date startTime() {
-	return new Date(this.timeStart);
+    public DateTime startTime() {
+	return new DateTime(timeStart);
     }
 
-    public Date endTime() {
-	return new Date(this.timeEnd);
+    public DateTime endTime() {
+	return new DateTime(timeEnd);
     }
 
     public void completed(final long timeEnd) {

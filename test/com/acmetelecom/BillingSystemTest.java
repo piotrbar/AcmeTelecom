@@ -1,69 +1,67 @@
 package com.acmetelecom;
 
-import static org.junit.Assert.fail;
-
 import org.jmock.Expectations;
 import org.jmock.Mockery;
-import org.junit.After;
+import org.jmock.integration.junit4.JUnit4Mockery;
+import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.acmetelecom.exceptions.IllegalCallException;
+
 public class BillingSystemTest {
-    Mockery context = new Mockery();
-    final String caller = "1234";
-    final String callee = "5678";
-    final CallLog callLog = context.mock(CallLog.class);
-    final BillingSystem billingSystem = new BillingSystem(callLog);
+
+    private final Mockery context = new JUnit4Mockery() {
+	{
+	    setImposteriser(ClassImposteriser.INSTANCE);
+	}
+    };
+
+    private final String caller = "1234";
+    private final String callee = "5678";
+    private BillingSystem billingSystem;
+    private Biller biller;
+    private CallTracker tracker;
 
     @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
-    @Test
-    public void testCallInitiated() throws InvalidCallException {
-	context.checking(new Expectations() {
-	    {
-		oneOf(callLog).callInitiated(caller, callee);
-	    }
-	});
-	billingSystem.callInitiated(caller, callee);
-    }
-
-    @Test(expected = InvalidCallException.class)
-    public void testOnlyOneActiveCallPerCaller() throws InvalidCallException {
-	testCallInitiated();
-	billingSystem.callInitiated(caller, callee);
+    public void setUp() {
+	biller = context.mock(Biller.class);
+	tracker = context.mock(CallTracker.class);
+	billingSystem = new BillingSystem(biller, tracker);
     }
 
     @Test
-    public void testCallCompleted() throws InvalidCallException {
+    public void testCallInitiated() throws IllegalCallException {
+	context.checking(new Expectations() {
+	    {
+		oneOf(tracker).callInitiated(caller, callee);
+	    }
+	});
+	billingSystem.callInitiated(caller, callee);
+	context.assertIsSatisfied();
+    }
+
+    @Test
+    public void testCallCompleted() throws IllegalCallException {
 	testCallInitiated();
 	context.checking(new Expectations() {
 	    {
-		oneOf(callLog).callCompleted(caller, callee);
+		oneOf(tracker).callCompleted(caller, callee);
 	    }
 	});
 	billingSystem.callCompleted(caller, callee);
-    }
-
-    @Test(expected = InvalidCallException.class)
-    public void testOnlyActiveCallCanBeCompleted() throws InvalidCallException {
-	billingSystem.callCompleted(caller, callee);
-    }
-
-    @Test(expected = InvalidCallException.class)
-    public void testActiveCallCanOnlyBeCompletedOnce() throws InvalidCallException {
-	testCallCompleted();
-	billingSystem.callCompleted(caller, callee);
+	context.assertIsSatisfied();
     }
 
     @Test
     public void testCreateCustomerBills() {
-	fail("Not yet implemented");
+	context.checking(new Expectations() {
+	    {
+		oneOf(biller).createCustomerBills();
+	    }
+	});
+	billingSystem.createCustomerBills();
+	context.assertIsSatisfied();
     }
 
 }
