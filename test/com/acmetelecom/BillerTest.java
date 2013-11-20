@@ -27,7 +27,6 @@ public class BillerTest {
 
     private Biller biller;
     private BillGenerator billGenerator;
-    private CallCostCalculator callCostCalculator;
     private List<Customer> customers;
 
     private CallLog callLog;
@@ -82,14 +81,13 @@ public class BillerTest {
 	});
 
 	callLog = new ListCallLog();
-	callCostCalculator = new CallCostCalculator();
 
 	// Mock the bill generator, we don't want to be actually sending the
 	// bills to anybody
 	billGenerator = context.mock(BillGenerator.class);
 
 	// Create the biller to test injecting all the dependencies
-	biller = new Biller(callLog, tariffLibrary, customerDatabase, billGenerator, callCostCalculator);
+	biller = new Biller(callLog, tariffLibrary, customerDatabase, billGenerator);
 
     }
 

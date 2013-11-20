@@ -24,7 +24,6 @@ import com.acmetelecom.BillGenerator;
 import com.acmetelecom.Biller;
 import com.acmetelecom.BillingSystem;
 import com.acmetelecom.Call;
-import com.acmetelecom.CallCostCalculator;
 import com.acmetelecom.CallLog;
 import com.acmetelecom.CallTracker;
 import com.acmetelecom.FilePrinter;
@@ -46,7 +45,6 @@ public class AcmeTelecomSteps {
     private final Biller biller;
     private final CallTracker tracker;
     private final BillGenerator generator;
-    private final CallCostCalculator callCostCalculator;
     private final FilePrinter printer;
 
     final JUnit4Mockery context;
@@ -74,8 +72,7 @@ public class AcmeTelecomSteps {
 	tracker = new CallTracker(callLog);
 	printer = (FilePrinter) FilePrinter.getInstance();
 	generator = new BillGenerator(printer);
-	callCostCalculator = new CallCostCalculator();
-	biller = new Biller(callLog, tariffLibrary, customerDatabase, generator, callCostCalculator);
+	biller = new Biller(callLog, tariffLibrary, customerDatabase, generator);
 	billingSystem = new BillingSystem(biller, tracker);
     }
 

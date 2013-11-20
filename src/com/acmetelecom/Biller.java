@@ -21,22 +21,18 @@ public class Biller {
     private final TariffLibrary tariffLibrary;
     private final CustomerDatabase customerDatabase;
     private final BillGenerator billGenerator;
-    private final CallCostCalculator callCostCalculator;
 
     @Autowired
-    public Biller(final CallLog callLog, final TariffLibrary tariffLibrary, final CustomerDatabase customerDatabase, final BillGenerator billGenerator,
-	    final CallCostCalculator callCostCalculator) {
+    public Biller(final CallLog callLog, final TariffLibrary tariffLibrary, final CustomerDatabase customerDatabase, final BillGenerator billGenerator) {
 	this.callLog = callLog;
 	this.tariffLibrary = tariffLibrary;
 	this.customerDatabase = customerDatabase;
 	this.billGenerator = billGenerator;
-	this.callCostCalculator = callCostCalculator;
     }
 
-    public Biller(final CallLog callLog, final BillGenerator billGenerator, final CallCostCalculator callCostCalculator) {
+    public Biller(final CallLog callLog, final BillGenerator billGenerator) {
 	this.callLog = callLog;
 	this.billGenerator = billGenerator;
-	this.callCostCalculator = callCostCalculator;
 	tariffLibrary = CentralTariffDatabase.getInstance();
 	customerDatabase = CentralCustomerDatabase.getInstance();
     }
@@ -59,7 +55,16 @@ public class Biller {
 
 	    final Tariff tariff = tariffLibrary.tarriffFor(customer);
 
-	    BigDecimal cost = callCostCalculator.calculate(call, tariff);
+	    BigDecimal cost;
+
+	    final DaytimePeakPeriod peakPeriod = new DaytimePeakPeriod();
+
+	    final int noOfPeakSeconds = peakPeriod.getPeakSeconds(call.startTime(), call.endTime());
+
+	    final BigDecimal peakCost = new BigDecimal(noOfPeakSeconds).multiply(tariff.peakRate());
+	    final BigDecimal offPeakCost = new BigDecimal(call.durationSeconds() - noOfPeakSeconds).multiply(tariff.offPeakRate());
+
+	    cost = peakCost.add(offPeakCost);
 
 	    cost = cost.setScale(0, RoundingMode.HALF_UP);
 	    final BigDecimal callCost = cost;
