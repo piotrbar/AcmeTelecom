@@ -11,7 +11,8 @@ public class Call {
     private Long timeEnd;
 
     /**
-     * 
+     * A new constructor for the call class. A call is incomplete until the
+     * timeEnd is set.
      */
     public Call(final String caller, final String callee, final long timeStart) {
 	this.caller = caller;

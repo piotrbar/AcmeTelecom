@@ -3,6 +3,7 @@ package com.acmetelecom;
 import java.math.BigDecimal;
 
 public class BillingSystem {
+
     private final Biller biller;
     private final CallTracker callTracker;
 
@@ -12,15 +13,15 @@ public class BillingSystem {
     }
 
     public void callInitiated(final String caller, final String callee) {
-	callTracker.callInitiated(caller, callee);
+	this.callTracker.callInitiated(caller, callee);
     }
 
     public void callCompleted(final String caller, final String callee) {
-	callTracker.callCompleted(caller, callee);
+	this.callTracker.callCompleted(caller, callee);
     }
 
     public void createCustomerBills() {
-	biller.createCustomerBills();
+	this.biller.createCustomerBills();
     }
 
     static class LineItem {
@@ -33,20 +34,21 @@ public class BillingSystem {
 	}
 
 	public String date() {
-	    return call.date();
+	    return this.call.date();
 	}
 
 	public String callee() {
-	    return call.callee();
+	    return this.call.callee();
 	}
 
 	// TODO Shall we abstract out the Formatter?
 	public String durationMinutes() {
-	    return "" + call.durationSeconds() / 60 + ":" + String.format("%02d", call.durationSeconds() % 60);
+	    return "" + this.call.durationSeconds() / 60 + ":" + String.format("%02d", this.call.durationSeconds() % 60);
 	}
 
 	public BigDecimal cost() {
-	    return callCost;
+	    return this.callCost;
 	}
     }
+
 }
