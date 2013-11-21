@@ -3,7 +3,6 @@ package com.acmetelecom;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Interval;
-import org.joda.time.Seconds;
 
 public class DaytimePeakPeriod {
 
@@ -44,6 +43,24 @@ public class DaytimePeakPeriod {
 	return (24 * 60 * 60) - offPeakSeconds;
     }
 
+    public int getPeakSeconds(final DateTime startTime, final DateTime endTime) {
+
+	DateTime newEndTime = new DateTime(endTime);
+	Interval interval = new Interval(startTime, newEndTime);
+	int peakSeconds = 0;
+
+	while (interval.toDuration().getStandardSeconds() > secondsInADay) {
+	    peakSeconds += getPeakSecondsInADay();
+	    newEndTime = newEndTime.minusDays(1);
+	    interval = new Interval(startTime, newEndTime);
+	}
+
+	peakSeconds += getPeakSeconds24(startTime, newEndTime);
+
+	return peakSeconds;
+
+    }
+
     /**
      * Current implementation assumes calls are no longer than 24hrs.
      * 
@@ -51,7 +68,7 @@ public class DaytimePeakPeriod {
      * @param endTime
      * @return
      */
-    public int getPeakSeconds(final DateTime startTime, final DateTime endTime) {
+    private int getPeakSeconds24(final DateTime startTime, final DateTime endTime) {
 	// Case 1: Both times are within off peak periods
 	if (offPeak(startTime) && offPeak(endTime)) {
 	    if (endTime.isBefore(getStartOfPeak(startTime))) {
@@ -74,7 +91,8 @@ public class DaytimePeakPeriod {
 	}
 	// Case 4: Both times are on peak
 	else {
-	    final int duration = Seconds.secondsBetween(startTime, endTime).getSeconds();
+	    final Interval interval = new Interval(startTime, endTime);
+	    int duration = (int) interval.toDuration().getStandardSeconds();
 	    if (endTime.isBefore(getEndOfPeak(startTime))) {
 		return duration;
 	    } else {
