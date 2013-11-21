@@ -1,4 +1,4 @@
-package com.acmetelecom;
+package com.acmetelecom.billing.strategy;
 
 import org.joda.time.DateTime;
 import org.joda.time.Days;

@@ -12,12 +12,12 @@
 
    <bean id="peakPeriod" 
          name="billing.peakperiod" 
-         class="com.acmetelecom.DaytimePeakPeriod"
+         class="com.acmetelecom.billing.strategy.DaytimePeakPeriod"
          scope="singleton" />
          
    <bean id="htmlPrinter" 
          name="billing.printer" 
-         class="com.acmetelecom.HtmlPrinter"
+         class="com.acmetelecom.util.HtmlPrinter"
          factory-method="getInstance"
          scope="singleton" />
          
@@ -35,23 +35,23 @@
          
    <bean id="listCallLog" 
          name="billing.calllog" 
-         class="com.acmetelecom.ListCallLog" />
+         class="com.acmetelecom.calling.ListCallLog" />
 
    <bean id="billingStrategy" 
          name="billing.strategy" 
-         class="com.acmetelecom.FairBillingStrategy" />
+         class="com.acmetelecom.billing.strategy.FairBillingStrategy" />
          
    <bean id="billGenerator" 
          name="billing.generator" 
-         class="com.acmetelecom.BillGenerator" />
+         class="com.acmetelecom.billing.BillGenerator" />
     
    <bean id="callTracker" 
          name="billing.tracker" 
-         class="com.acmetelecom.CallTracker" /> 
+         class="com.acmetelecom.calling.CallTracker" /> 
                   
    <bean id="biller" 
          name="billing.biller" 
-         class="com.acmetelecom.Biller" />
+         class="com.acmetelecom.billing.Biller" />
          
    <bean id="billingSystem" 
          name="billing.system" 

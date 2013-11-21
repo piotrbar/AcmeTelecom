@@ -1,10 +1,13 @@
-package com.acmetelecom;
+package com.acmetelecom.billing;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.acmetelecom.customer.Customer;
+import com.acmetelecom.util.HtmlPrinter;
+import com.acmetelecom.util.MoneyFormatter;
+import com.acmetelecom.util.Printer;
 
 /**
  * Provides functionality for generating/printing bills.
@@ -39,11 +42,11 @@ public class BillGenerator {
     /**
      * Formats the bill according to the printer standards and prints it.
      */
-    public void send(final Customer customer, final List<BillingSystem.LineItem> calls, final String totalBill) {
+    public void send(final Customer customer, final List<LineItem> calls, final String totalBill) {
 	// Format the bill nicely
 	printer.printHeading(customer.getFullName(), customer.getPhoneNumber(), customer.getPricePlan());
 	// Print the price and duration for each call on a separate line
-	for (final BillingSystem.LineItem call : calls) {
+	for (final LineItem call : calls) {
 	    printer.printItem(call.date(), call.callee(), call.durationMinutes(), MoneyFormatter.penceToPounds(call.cost()));
 	}
 	// The total damage

@@ -1,18 +1,17 @@
-package com.acmetelecom;
+package com.acmetelecom.util;
+
 
 /**
- * Prints HTML to a file.
+ * Prints HTML to the console.
  */
-public class FilePrinter implements Printer {
+public class HtmlPrinter implements Printer {
 
-    private static Printer instance = new FilePrinter();
-    private final StringBuilder billBuilder;
+    private static Printer instance = new HtmlPrinter();
 
     /**
      * Singleton pattern.
      */
-    private FilePrinter() {
-	billBuilder = new StringBuilder();
+    private HtmlPrinter() {
     }
 
     public static Printer getInstance() {
@@ -22,7 +21,7 @@ public class FilePrinter implements Printer {
     @Override
     public void printHeading(final String name, final String phoneNumber, final String pricePlan) {
 	beginHtml();
-	billBuilder.append(h2(name + "/" + phoneNumber + " - " + "Price Plan: " + pricePlan) + "\n");
+	System.out.println(h2(name + "/" + phoneNumber + " - " + "Price Plan: " + pricePlan));
 	beginTable();
     }
 
@@ -30,15 +29,15 @@ public class FilePrinter implements Printer {
      * Begin HTML table.
      */
     private void beginTable() {
-	billBuilder.append("<table border=\"1\">\n");
-	billBuilder.append(tr(th("Time") + th("Number") + th("Duration") + th("Cost")) + "\n");
+	System.out.println("<table border=\"1\">");
+	System.out.println(tr(th("Time") + th("Number") + th("Duration") + th("Cost")));
     }
 
     /**
      * End HTML table.
      */
     private void endTable() {
-	billBuilder.append("</table>\n");
+	System.out.println("</table>");
     }
 
     /**
@@ -50,7 +49,7 @@ public class FilePrinter implements Printer {
 
     @Override
     public void printItem(final String time, final String callee, final String duration, final String cost) {
-	billBuilder.append(tr(td(time) + td(callee) + td(duration) + td(cost)) + "\n");
+	System.out.println(tr(td(time) + td(callee) + td(duration) + td(cost)));
     }
 
     /**
@@ -68,7 +67,7 @@ public class FilePrinter implements Printer {
     }
 
     /**
-     * Print column.
+     * Print table column.
      */
     private String td(final String text) {
 	return "<td>" + text + "</td>";
@@ -77,7 +76,7 @@ public class FilePrinter implements Printer {
     @Override
     public void printTotal(final String total) {
 	endTable();
-	billBuilder.append(h2("Total: " + total) + "\n");
+	System.out.println(h2("Total: " + total));
 	endHtml();
     }
 
@@ -85,25 +84,16 @@ public class FilePrinter implements Printer {
      * Annotates an HTML page.
      */
     private void beginHtml() {
-	billBuilder.append("<html>\n");
-	billBuilder.append("<head></head>\n");
-	billBuilder.append("<body>\n");
-	billBuilder.append("<h1>\n");
-	billBuilder.append("Acme Telecom\n");
-	billBuilder.append("</h1>\n");
+	System.out.println("<html>");
+	System.out.println("<head></head>");
+	System.out.println("<body>");
+	System.out.println("<h1>");
+	System.out.println("Acme Telecom");
+	System.out.println("</h1>");
     }
 
     private void endHtml() {
-	billBuilder.append("</body>\n");
-	billBuilder.append("</html>\n");
+	System.out.println("</body>");
+	System.out.println("</html>");
     }
-
-    public String getBill() {
-	return billBuilder.toString();
-    }
-
-    public void flush() {
-	billBuilder.setLength(0);
-    }
-
 }

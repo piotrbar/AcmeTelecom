@@ -1,13 +1,22 @@
 package com.acmetelecom;
 
-import java.math.BigDecimal;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.acmetelecom.billing.Biller;
+import com.acmetelecom.calling.CallTracker;
 import com.acmetelecom.exceptions.IllegalCallException;
 
+/**
+ * Billing system is the main entry point to the system. It's main purpose is
+ * bill generation for all customers in a database.
+ * 
+ * For legacy reasons it is also used for call registration. Internally, this is
+ * delegated to the CallTracker. Consumer packages can use the BillingSystem by
+ * importing our Spring configuration and simply autowiring this class.
+ * 
+ */
 public class BillingSystem {
 
     private final Biller biller;
@@ -41,33 +50,6 @@ public class BillingSystem {
 
     public void createCustomerBills() {
 	biller.createCustomerBills();
-    }
-
-    static class LineItem {
-	private final FinishedCall call;
-	private final BigDecimal callCost;
-
-	public LineItem(final FinishedCall call, final BigDecimal callCost) {
-	    this.call = call;
-	    this.callCost = callCost;
-	}
-
-	public String date() {
-	    return call.date();
-	}
-
-	public String callee() {
-	    return call.callee();
-	}
-
-	// TODO Shall we abstract out the Formatter?
-	public String durationMinutes() {
-	    return "" + call.durationSeconds() / 60 + ":" + String.format("%02d", call.durationSeconds() % 60);
-	}
-
-	public BigDecimal cost() {
-	    return callCost;
-	}
     }
 
 }

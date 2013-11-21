@@ -1,9 +1,12 @@
-package com.acmetelecom;
+package com.acmetelecom.billing;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.acmetelecom.billing.strategy.BillingStrategy;
+import com.acmetelecom.calling.CallLog;
+import com.acmetelecom.calling.FinishedCall;
 import com.acmetelecom.customer.Customer;
 import com.acmetelecom.customer.CustomerDatabase;
 import com.acmetelecom.customer.Tariff;

@@ -1,9 +1,8 @@
-package com.acmetelecom;
+package com.acmetelecom.billing;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.acmetelecom.BillingSystem.LineItem;
 import com.acmetelecom.customer.Customer;
 
 public class Bill {

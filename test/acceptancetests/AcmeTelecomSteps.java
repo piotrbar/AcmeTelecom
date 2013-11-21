@@ -20,21 +20,21 @@ import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 import org.junit.Assert;
 
-import com.acmetelecom.BillGenerator;
-import com.acmetelecom.Biller;
-import com.acmetelecom.BillingStrategy;
 import com.acmetelecom.BillingSystem;
-import com.acmetelecom.CallLog;
-import com.acmetelecom.CallTracker;
-import com.acmetelecom.DaytimePeakPeriod;
-import com.acmetelecom.FilePrinter;
-import com.acmetelecom.FinishedCall;
-import com.acmetelecom.ListCallLog;
-import com.acmetelecom.FairBillingStrategy;
+import com.acmetelecom.billing.BillGenerator;
+import com.acmetelecom.billing.Biller;
+import com.acmetelecom.billing.strategy.BillingStrategy;
+import com.acmetelecom.billing.strategy.DaytimePeakPeriod;
+import com.acmetelecom.billing.strategy.FairBillingStrategy;
+import com.acmetelecom.calling.CallLog;
+import com.acmetelecom.calling.CallTracker;
+import com.acmetelecom.calling.FinishedCall;
+import com.acmetelecom.calling.ListCallLog;
 import com.acmetelecom.customer.Customer;
 import com.acmetelecom.customer.CustomerDatabase;
 import com.acmetelecom.customer.Tariff;
 import com.acmetelecom.customer.TariffLibrary;
+import com.acmetelecom.util.StringPrinter;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
@@ -48,7 +48,7 @@ public class AcmeTelecomSteps {
     private final Biller biller;
     private final CallTracker tracker;
     private final BillGenerator generator;
-    private final FilePrinter printer;
+    private final StringPrinter printer;
 
     private final JUnit4Mockery context;
     private final TariffLibrary tariffLibrary;
@@ -77,7 +77,7 @@ public class AcmeTelecomSteps {
 
 	callLog = new ListCallLog();
 	tracker = new CallTracker(callLog);
-	printer = (FilePrinter) FilePrinter.getInstance();
+	printer = (StringPrinter) StringPrinter.getInstance();
 	generator = new BillGenerator(printer);
 	peakPeriod = new DaytimePeakPeriod(PEAK_START, PEAK_END);
 	billingStrategy = new FairBillingStrategy(peakPeriod);

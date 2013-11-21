@@ -1,6 +1,7 @@
-package com.acmetelecom;
+package com.acmetelecom.calling;
 
 import java.util.List;
+
 
 /**
  * A call log is a container for FinishedCall objects.

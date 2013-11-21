@@ -1,4 +1,4 @@
-package com.acmetelecom;
+package com.acmetelecom.billing.strategy;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -7,7 +7,9 @@ import java.util.List;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.acmetelecom.BillingSystem.LineItem;
+import com.acmetelecom.billing.Bill;
+import com.acmetelecom.billing.LineItem;
+import com.acmetelecom.calling.FinishedCall;
 import com.acmetelecom.customer.Customer;
 import com.acmetelecom.customer.Tariff;
 import com.google.common.collect.Lists;

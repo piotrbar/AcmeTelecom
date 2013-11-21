@@ -1,8 +1,9 @@
-package com.acmetelecom;
+package com.acmetelecom.calling;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+
 
 /**
  * A class encapsulating the behaviour of an active call. No end time, no

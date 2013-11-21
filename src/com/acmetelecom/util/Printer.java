@@ -1,4 +1,4 @@
-package com.acmetelecom;
+package com.acmetelecom.util;
 
 /**
  * Encapsulates the basic functionality of a printer.
