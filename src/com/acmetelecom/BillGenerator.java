@@ -42,4 +42,8 @@ public class BillGenerator {
 	printer.printTotal(totalBill);
     }
 
+    public void send(final Bill bill) {
+	send(bill.getCustomer(), bill.getRecords(), MoneyFormatter.penceToPounds(bill.getTotal()));
+    }
+
 }

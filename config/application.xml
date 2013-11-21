@@ -36,6 +36,10 @@
    <bean id="listCallLog" 
          name="billing.calllog" 
          class="com.acmetelecom.ListCallLog" />
+
+   <bean id="billingStrategy" 
+         name="billing.strategy" 
+         class="com.acmetelecom.FairBillingStrategy" />
          
    <bean id="billGenerator" 
          name="billing.generator" 

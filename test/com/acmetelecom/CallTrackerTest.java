@@ -36,7 +36,7 @@ public class CallTrackerTest {
     }
 
     @Test
-    public void testCompletingCall() throws IllegalCallException {
+    public void testCompletingCall() throws IllegalCallException, InterruptedException {
 	final ActiveCall initiatedCall = callTracker.callInitiated(caller, callee);
 
 	context.checking(new Expectations() {
@@ -44,6 +44,9 @@ public class CallTrackerTest {
 		oneOf(callLog).addCall(with(any(FinishedCall.class)));
 	    }
 	});
+
+	// Let's say the call lasts for 100 millis
+	Thread.sleep(100);
 
 	final FinishedCall completedCall = callTracker.callCompleted(caller, callee);
 

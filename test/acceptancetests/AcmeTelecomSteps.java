@@ -22,6 +22,7 @@ import org.junit.Assert;
 
 import com.acmetelecom.BillGenerator;
 import com.acmetelecom.Biller;
+import com.acmetelecom.BillingStrategy;
 import com.acmetelecom.BillingSystem;
 import com.acmetelecom.CallLog;
 import com.acmetelecom.CallTracker;
@@ -29,6 +30,7 @@ import com.acmetelecom.DaytimePeakPeriod;
 import com.acmetelecom.FilePrinter;
 import com.acmetelecom.FinishedCall;
 import com.acmetelecom.ListCallLog;
+import com.acmetelecom.FairBillingStrategy;
 import com.acmetelecom.customer.Customer;
 import com.acmetelecom.customer.CustomerDatabase;
 import com.acmetelecom.customer.Tariff;
@@ -53,10 +55,13 @@ public class AcmeTelecomSteps {
     private final CustomerDatabase customerDatabase;
     private final List<Customer> customers;
     private final DaytimePeakPeriod peakPeriod;
+    private final BillingStrategy billingStrategy;
 
     private static final int MILLIS_PER_HOUR = 3600000;
     private static final int MILLIS_PER_SECOND = 1000;
     private static final Random RANDOM = new Random();
+    private static final int PEAK_START = 11;
+    private static final int PEAK_END = 19;
 
     private static final Logger LOG = LogManager.getLogger(AcmeTelecomSteps.class);
 
@@ -74,8 +79,9 @@ public class AcmeTelecomSteps {
 	tracker = new CallTracker(callLog);
 	printer = (FilePrinter) FilePrinter.getInstance();
 	generator = new BillGenerator(printer);
-	peakPeriod = new DaytimePeakPeriod(11, 19);
-	biller = new Biller(callLog, tariffLibrary, customerDatabase, generator, peakPeriod);
+	peakPeriod = new DaytimePeakPeriod(PEAK_START, PEAK_END);
+	billingStrategy = new FairBillingStrategy(peakPeriod);
+	biller = new Biller(callLog, tariffLibrary, customerDatabase, generator, billingStrategy);
 	billingSystem = new BillingSystem(biller, tracker);
     }
 
