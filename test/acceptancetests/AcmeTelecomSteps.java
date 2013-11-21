@@ -23,11 +23,11 @@ import org.junit.Assert;
 import com.acmetelecom.BillGenerator;
 import com.acmetelecom.Biller;
 import com.acmetelecom.BillingSystem;
-import com.acmetelecom.Call;
 import com.acmetelecom.CallLog;
 import com.acmetelecom.CallTracker;
 import com.acmetelecom.DaytimePeakPeriod;
 import com.acmetelecom.FilePrinter;
+import com.acmetelecom.FinishedCall;
 import com.acmetelecom.ListCallLog;
 import com.acmetelecom.customer.Customer;
 import com.acmetelecom.customer.CustomerDatabase;
@@ -124,8 +124,7 @@ public class AcmeTelecomSteps {
 	final String user2No = getUserNumber(user2);
 
 	final long startTime = new DateTime().withTimeAtStartOfDay().getMillis() + convertToHour(hour) * MILLIS_PER_HOUR;
-	final Call call = new Call(user1No, user2No, startTime, startTime + seconds * MILLIS_PER_SECOND);
-	callLog.addCall(call);
+	callLog.addCall(new FinishedCall(user1No, user2No, startTime, startTime + seconds * MILLIS_PER_SECOND));
     }
 
     @Given("user $user1 did not make any calls")
