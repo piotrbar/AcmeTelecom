@@ -79,6 +79,30 @@ public class BillerTest {
 		will(returnValue("ripoff3"));
 	    }
 	});
+	customers.add(context.mock(Customer.class, "customer4"));
+	context.checking(new Expectations() {
+	    {
+		this.allowing(customers.get(3)).getFullName();
+		will(returnValue("cutomer4"));
+		this.allowing(customers.get(3)).getPhoneNumber();
+		will(returnValue("12327384759"));
+		this.allowing(customers.get(3)).getPricePlan();
+		will(returnValue("ripoff"));
+	    }
+	});
+	// Each customer is on a different tariff
+	context.checking(new Expectations() {
+	    {
+		this.allowing(tariffLibrary).tarriffFor(this.with(equal(customers.get(0))));
+		will(returnValue(Tariff.Business));
+		this.allowing(tariffLibrary).tarriffFor(this.with(equal(customers.get(1))));
+		will(returnValue(Tariff.Leisure));
+		this.allowing(tariffLibrary).tarriffFor(this.with(equal(customers.get(2))));
+		will(returnValue(Tariff.Standard));
+		this.allowing(tariffLibrary).tarriffFor(this.with(equal(customers.get(3))));
+		will(returnValue(Tariff.Business));
+	    }
+	});
 	context.checking(new Expectations() {
 	    {
 		this.allowing(customerDatabase).getCustomers();
@@ -93,6 +117,7 @@ public class BillerTest {
 	billGenerator = context.mock(BillGenerator.class);
 
 	// Create the biller to test injecting all the dependencies
+
 	biller = new Biller(callLog, tariffLibrary, customerDatabase, billGenerator, new DaytimePeakPeriod(peakStart, peakEnd));
 
     }
@@ -105,6 +130,7 @@ public class BillerTest {
 		this.oneOf(billGenerator).send(this.with(equal(customers.get(0))), this.with(any(List.class)), this.with(any(String.class)));
 		this.oneOf(billGenerator).send(this.with(equal(customers.get(1))), this.with(any(List.class)), this.with(any(String.class)));
 		this.oneOf(billGenerator).send(this.with(equal(customers.get(2))), this.with(any(List.class)), this.with(any(String.class)));
+		this.oneOf(billGenerator).send(this.with(equal(customers.get(3))), this.with(any(List.class)), this.with(any(String.class)));
 	    }
 	});
 
@@ -113,17 +139,6 @@ public class BillerTest {
 
     @Test
     public void testDifferentCustomersAreChargedAccordingToDifferentTarrifs() {
-	// Each customer is on a different tariff
-	context.checking(new Expectations() {
-	    {
-		this.allowing(tariffLibrary).tarriffFor(this.with(equal(customers.get(0))));
-		will(returnValue(Tariff.Business));
-		this.allowing(tariffLibrary).tarriffFor(this.with(equal(customers.get(1))));
-		will(returnValue(Tariff.Leisure));
-		this.allowing(tariffLibrary).tarriffFor(this.with(equal(customers.get(2))));
-		will(returnValue(Tariff.Standard));
-	    }
-	});
 
 	TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
@@ -143,6 +158,9 @@ public class BillerTest {
 			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Leisure.offPeakRate().multiply(hourInSeconds)))));
 		this.oneOf(billGenerator).send(this.with(equal(customers.get(2))), this.with(any(List.class)),
 			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Standard.offPeakRate().multiply(hourInSeconds)))));
+		this.oneOf(billGenerator).send(this.with(equal(customers.get(3))), this.with(any(List.class)),
+			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Business.offPeakRate().multiply(hourInSeconds)))));
+
 	    }
 	});
 
@@ -163,23 +181,15 @@ public class BillerTest {
 			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Leisure.peakRate().multiply(hourInSeconds)))));
 		this.oneOf(billGenerator).send(this.with(equal(customers.get(2))), this.with(any(List.class)),
 			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Standard.peakRate().multiply(hourInSeconds)))));
+		this.oneOf(billGenerator).send(this.with(equal(customers.get(3))), this.with(any(List.class)),
+			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Business.peakRate().multiply(hourInSeconds)))));
+
 	    }
 	});
     }
 
     @Test
     public void testCorrectTotalSpanningPeakAndOffPeak() {
-	// Each customer is on a different tariff
-	context.checking(new Expectations() {
-	    {
-		this.allowing(tariffLibrary).tarriffFor(this.with(equal(customers.get(0))));
-		will(returnValue(Tariff.Business));
-		this.allowing(tariffLibrary).tarriffFor(this.with(equal(customers.get(1))));
-		will(returnValue(Tariff.Leisure));
-		this.allowing(tariffLibrary).tarriffFor(this.with(equal(customers.get(2))));
-		will(returnValue(Tariff.Standard));
-	    }
-	});
 
 	TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
@@ -196,6 +206,7 @@ public class BillerTest {
 	final BigDecimal oneHoursInSeconds = new BigDecimal(1 * 60 * 60);
 	final BigDecimal twoHoursInSeconds = new BigDecimal(2 * 60 * 60);
 	final BigDecimal twelveHoursInSeconds = new BigDecimal(12 * 60 * 60);
+	final BigDecimal twentyFiveHoursInSeconds = new BigDecimal(25 * 60 * 60);
 
 	context.checking(new Expectations() {
 	    {
@@ -214,6 +225,11 @@ public class BillerTest {
 			this.with(any(List.class)),
 			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Standard.peakRate().multiply(twelveHoursInSeconds)
 				.add(Tariff.Standard.offPeakRate().multiply(twoHoursInSeconds))))));
+		this.oneOf(billGenerator).send(
+			this.with(equal(customers.get(3))),
+			this.with(any(List.class)),
+			this.with(equal(MoneyFormatter.penceToPounds(Tariff.Business.peakRate().multiply(twentyFiveHoursInSeconds)
+				.add(Tariff.Business.offPeakRate().multiply(twentyFiveHoursInSeconds))))));
 	    }
 	});
 

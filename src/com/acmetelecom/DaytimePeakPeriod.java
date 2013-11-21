@@ -3,7 +3,6 @@ package com.acmetelecom;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Interval;
-import org.joda.time.Seconds;
 
 public class DaytimePeakPeriod {
 
@@ -13,17 +12,18 @@ public class DaytimePeakPeriod {
     // hours
     private final int peakStart;
     private final int peakEnd;
-    private final int offPeakSeconds;
+    private final int peakSeconds;
 
     public DaytimePeakPeriod(final int peakStart, final int peakEnd) {
 	this.peakStart = peakStart;
 	this.peakEnd = peakEnd;
 
 	if (peakEnd - peakStart > 0) {
-	    offPeakSeconds = (peakEnd - peakStart) * 60 * 60;
+	    peakSeconds = (peakEnd - peakStart) * 60 * 60;
 	} else {
-	    offPeakSeconds = ((24 - peakStart) + peakEnd) * 60 * 60;
+	    peakSeconds = ((24 - peakStart) + peakEnd) * 60 * 60;
 	}
+
     }
 
     @Deprecated
@@ -37,11 +37,29 @@ public class DaytimePeakPeriod {
     }
 
     public int getOffPeakSecondsInADay() {
-	return offPeakSeconds;
+	return (24 * 60 * 60) - peakSeconds;
     }
 
     public int getPeakSecondsInADay() {
-	return (24 * 60 * 60) - offPeakSeconds;
+	return peakSeconds;
+    }
+
+    public int getPeakSeconds(final DateTime startTime, final DateTime endTime) {
+
+	DateTime newEndTime = new DateTime(endTime);
+	Interval interval = new Interval(startTime, newEndTime);
+	int peakSeconds = 0;
+
+	while (interval.toDuration().getStandardSeconds() > secondsInADay) {
+	    peakSeconds += getPeakSecondsInADay();
+	    newEndTime = newEndTime.minusDays(1);
+	    interval = new Interval(startTime, newEndTime);
+	}
+
+	peakSeconds += getPeakSeconds24(startTime, newEndTime);
+
+	return peakSeconds;
+
     }
 
     /**
@@ -51,7 +69,7 @@ public class DaytimePeakPeriod {
      * @param endTime
      * @return
      */
-    public int getPeakSeconds(final DateTime startTime, final DateTime endTime) {
+    private int getPeakSeconds24(final DateTime startTime, final DateTime endTime) {
 	// Case 1: Both times are within off peak periods
 	if (offPeak(startTime) && offPeak(endTime)) {
 	    if (endTime.isBefore(getStartOfPeak(startTime))) {
@@ -74,11 +92,12 @@ public class DaytimePeakPeriod {
 	}
 	// Case 4: Both times are on peak
 	else {
-	    final int duration = Seconds.secondsBetween(startTime, endTime).getSeconds();
+	    final Interval interval = new Interval(startTime, endTime);
+	    int duration = (int) interval.toDuration().getStandardSeconds();
 	    if (endTime.isBefore(getEndOfPeak(startTime))) {
 		return duration;
 	    } else {
-		return duration - offPeakSeconds;
+		return duration - getOffPeakSecondsInADay();
 	    }
 	}
 

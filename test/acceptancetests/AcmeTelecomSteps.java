@@ -48,7 +48,7 @@ public class AcmeTelecomSteps {
     private final BillGenerator generator;
     private final FilePrinter printer;
 
-    final JUnit4Mockery context;
+    private final JUnit4Mockery context;
     private final TariffLibrary tariffLibrary;
     private final CustomerDatabase customerDatabase;
     private final List<Customer> customers;
@@ -88,7 +88,7 @@ public class AcmeTelecomSteps {
 
     /* -------------- GIVEN ---------------- */
 
-    @Given("users $users with $tariffType tariff exist in the database")
+    @Given("users $users with $tariffType tariff in the database")
     public void given_user_exists(final List<String> users, final String tariffType) {
 	for (final String user : users) {
 	    customers.add(new Customer(user, String.valueOf(nextRandomPhoneNumber()), tariffType));
@@ -145,6 +145,14 @@ public class AcmeTelecomSteps {
 	final String user2No = getUserNumber(user2);
 
 	billingSystem.callInitiated(user1No, user2No);
+    }
+
+    @When("user $user1 finishes a call with user $user2")
+    public void when_user_finishes_a_call(final String user1, final String user2) throws InterruptedException {
+	final String user1No = getUserNumber(user1);
+	final String user2No = getUserNumber(user2);
+
+	billingSystem.callCompleted(user1No, user2No);
     }
 
     /* -------------- THEN ---------------- */
