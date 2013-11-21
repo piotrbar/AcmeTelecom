@@ -12,17 +12,18 @@ public class DaytimePeakPeriod {
     // hours
     private final int peakStart;
     private final int peakEnd;
-    private final int offPeakSeconds;
+    private final int peakSeconds;
 
     public DaytimePeakPeriod(final int peakStart, final int peakEnd) {
 	this.peakStart = peakStart;
 	this.peakEnd = peakEnd;
 
 	if (peakEnd - peakStart > 0) {
-	    offPeakSeconds = (peakEnd - peakStart) * 60 * 60;
+	    peakSeconds = (peakEnd - peakStart) * 60 * 60;
 	} else {
-	    offPeakSeconds = ((24 - peakStart) + peakEnd) * 60 * 60;
+	    peakSeconds = ((24 - peakStart) + peakEnd) * 60 * 60;
 	}
+
     }
 
     @Deprecated
@@ -36,11 +37,11 @@ public class DaytimePeakPeriod {
     }
 
     public int getOffPeakSecondsInADay() {
-	return offPeakSeconds;
+	return (24 * 60 * 60) - peakSeconds;
     }
 
     public int getPeakSecondsInADay() {
-	return (24 * 60 * 60) - offPeakSeconds;
+	return peakSeconds;
     }
 
     public int getPeakSeconds(final DateTime startTime, final DateTime endTime) {
@@ -96,7 +97,7 @@ public class DaytimePeakPeriod {
 	    if (endTime.isBefore(getEndOfPeak(startTime))) {
 		return duration;
 	    } else {
-		return duration - offPeakSeconds;
+		return duration - getOffPeakSecondsInADay();
 	    }
 	}
 

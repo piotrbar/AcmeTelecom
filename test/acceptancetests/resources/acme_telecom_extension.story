@@ -25,6 +25,12 @@ And user John called user Dan for 7200 seconds at 6pm
 When all the bills are generated
 Then the total for user John is 25.20
 
+Scenario: A user starts a call in the peak period and finishes in the off-peak period
+Given users John,Dan with Standard tariff in the database
+And user John called user Dan for 180000 seconds at 6pm
+When all the bills are generated
+Then the total for user John is 543.60
+
 Scenario: A user cannot call himself
 Given users John,Dan with Standard tariff in the database
 When user Dan calls user Dan
