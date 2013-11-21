@@ -1,5 +1,6 @@
 package com.acmetelecom;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -44,4 +45,63 @@ public class DaytimePeakPeriodTest {
 	}
     }
 
+    @Test
+    public void testGetOffPeakSecondsInADay() {
+	DaytimePeakPeriod peakPeriod = new DaytimePeakPeriod(7, 19);
+	assertEquals(peakPeriod.getOffPeakSecondsInADay(), 12 * 3600);
+	peakPeriod = new DaytimePeakPeriod(22, 5);
+	assertEquals(peakPeriod.getOffPeakSecondsInADay(), 17 * 3600);
+    }
+
+    @Test
+    public void testGetPeakSecondsInADay() {
+	DaytimePeakPeriod peakPeriod = new DaytimePeakPeriod(7, 19);
+	assertEquals(peakPeriod.getPeakSecondsInADay(), 12 * 3600);
+	peakPeriod = new DaytimePeakPeriod(22, 5);
+	assertEquals(peakPeriod.getPeakSecondsInADay(), 7 * 3600);
+    }
+
+    @Test
+    public void testGetPeakSeconds() {
+	DaytimePeakPeriod peakPeriod = new DaytimePeakPeriod(7, 19);
+
+	// Test call which starts and ends during the peak period
+	DateTime startTime = new DateTime(2013, 1, 1, 7, 0, 0);
+	DateTime endTime = new DateTime(2013, 1, 1, 9, 0, 0);
+	assertEquals(peakPeriod.getPeakSeconds(startTime, endTime), 7200);
+
+	// Test call which starts and ends during the off peak period
+	startTime = new DateTime(2013, 1, 1, 19, 0, 0);
+	endTime = new DateTime(2013, 1, 1, 21, 0, 0);
+	assertEquals(peakPeriod.getPeakSeconds(startTime, endTime), 0);
+
+	// Test call which starts on peak and ends off peak
+	startTime = new DateTime(2013, 1, 1, 18, 0, 0);
+	endTime = new DateTime(2013, 1, 1, 20, 0, 0);
+	assertEquals(peakPeriod.getPeakSeconds(startTime, endTime), 3600);
+
+	// Test call which starts off peak and ends on peak
+	startTime = new DateTime(2013, 1, 1, 6, 0, 0);
+	endTime = new DateTime(2013, 1, 1, 8, 0, 0);
+	assertEquals(peakPeriod.getPeakSeconds(startTime, endTime), 3600);
+
+	// Test call which starts off peak and ends off peak with a whole
+	// peak period in between
+	startTime = new DateTime(2013, 1, 1, 6, 0, 0);
+	endTime = new DateTime(2013, 1, 1, 20, 0, 0);
+	assertEquals(peakPeriod.getPeakSeconds(startTime, endTime), 43200);
+
+	// Test call which starts on peak and ends on peak with a whole off
+	// peak period in between
+	startTime = new DateTime(2013, 1, 1, 18, 0, 0);
+	endTime = new DateTime(2013, 1, 2, 8, 0, 0);
+	assertEquals(peakPeriod.getPeakSeconds(startTime, endTime), 7200);
+
+	// Test call which lasts spans 2 days
+	startTime = new DateTime(2013, 1, 1, 8, 0, 0);
+	endTime = new DateTime(2013, 1, 2, 8, 0, 0);
+	assertEquals(peakPeriod.getPeakSeconds(startTime, endTime), 43200);
+
+	// ar, month, day, hour, minute, second
+    }
 }

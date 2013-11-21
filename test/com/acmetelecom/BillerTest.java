@@ -202,6 +202,8 @@ public class BillerTest {
 	callLog.addCall(new FinishedCall(customers.get(1).getPhoneNumber(), "mother", hourLength * 18, hourLength * 20));
 	// 6am to 8pm = 14hr long
 	callLog.addCall(new FinishedCall(customers.get(2).getPhoneNumber(), "mother", hourLength * 6, hourLength * 20));
+	// 6am to 8am (50 hour call)
+	callLog.addCall(new FinishedCall(customers.get(3).getPhoneNumber(), "mother", hourLength * 6, hourLength * 56));
 
 	final BigDecimal oneHoursInSeconds = new BigDecimal(1 * 60 * 60);
 	final BigDecimal twoHoursInSeconds = new BigDecimal(2 * 60 * 60);
