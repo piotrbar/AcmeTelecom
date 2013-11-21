@@ -9,6 +9,7 @@ import org.jmock.Mockery;
 import org.jmock.Sequence;
 import org.jmock.integration.junit4.JMock;
 import org.jmock.integration.junit4.JUnit4Mockery;
+import org.jmock.lib.concurrent.Synchroniser;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.After;
 import org.junit.Before;
@@ -23,8 +24,8 @@ public class BillGeneratorTest {
 
     Mockery context = new JUnit4Mockery() {
 	{
-	    setImposteriser(ClassImposteriser.INSTANCE); // Allow to mock
-							 // concrete classes
+	    setImposteriser(ClassImposteriser.INSTANCE);
+	    setThreadingPolicy(new Synchroniser());
 	}
     };
 
@@ -55,13 +56,13 @@ public class BillGeneratorTest {
 	context.checking(new Expectations() {
 	    {
 		allowing(call).date();
-			will(returnValue(time));
+		will(returnValue(time));
 		allowing(call).callee();
-			will(returnValue(callee));
+		will(returnValue(callee));
 		allowing(call).durationMinutes();
-			will(returnValue(duration));
+		will(returnValue(duration));
 		allowing(call).cost();
-			will(returnValue(cost));
+		will(returnValue(cost));
 	    }
 	});
 	for (int i = 0; i < 3; ++i) {
@@ -72,11 +73,11 @@ public class BillGeneratorTest {
 	context.checking(new Expectations() {
 	    {
 		allowing(customer).getFullName();
-			will(returnValue(customerName));
+		will(returnValue(customerName));
 		allowing(customer).getPhoneNumber();
-			will(returnValue(customerNumber));
+		will(returnValue(customerNumber));
 		allowing(customer).getPricePlan();
-			will(returnValue(customerPlan));
+		will(returnValue(customerPlan));
 	    }
 	});
     }
@@ -91,13 +92,13 @@ public class BillGeneratorTest {
 	// Make sure everything gets printed
 	context.checking(new Expectations() {
 	    {
-		oneOf(printer).printHeading(with(equal(customerName)), with(equal(customerNumber)), with(equal(customerPlan))); inSequence(printSequence);
-		exactly(calls.size()).of(printer).printItem(
-			with(equal(time)), 
-			with(equal(callee)), 
-			with(equal(duration)), 
-			with(equal(MoneyFormatter.penceToPounds(cost)))); inSequence(printSequence);
-		oneOf(printer).printTotal(with(equal(totalBill))); inSequence(printSequence);
+		oneOf(printer).printHeading(with(equal(customerName)), with(equal(customerNumber)), with(equal(customerPlan)));
+		inSequence(printSequence);
+		exactly(calls.size()).of(printer).printItem(with(equal(time)), with(equal(callee)), with(equal(duration)),
+			with(equal(MoneyFormatter.penceToPounds(cost))));
+		inSequence(printSequence);
+		oneOf(printer).printTotal(with(equal(totalBill)));
+		inSequence(printSequence);
 	    }
 	});
 
