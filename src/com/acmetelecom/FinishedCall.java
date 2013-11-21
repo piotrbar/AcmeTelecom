@@ -27,6 +27,9 @@ public class FinishedCall extends Call {
 	this.timeEnd = timeEnd;
     }
 
+    /**
+     * Gives the duration of the call in seconds.
+     */
     public int durationSeconds() {
 	return (int) (((timeEnd - timeStart) / 1000));
     }
