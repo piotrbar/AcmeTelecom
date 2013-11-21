@@ -1,5 +1,8 @@
 package com.acmetelecom;
 
+/**
+ * Encapsulates the basic functionality of a printer.
+ */
 public interface Printer {
 
     void printHeading(String name, String phoneNumber, String pricePlan);

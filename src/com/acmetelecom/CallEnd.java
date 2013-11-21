@@ -1,7 +1,8 @@
 package com.acmetelecom;
 
+@Deprecated
 public class CallEnd extends CallEvent {
-    public CallEnd(String caller, String callee) {
-        super(caller, callee, System.currentTimeMillis());
+    public CallEnd(final String caller, final String callee) {
+	super(caller, callee, System.currentTimeMillis());
     }
 }

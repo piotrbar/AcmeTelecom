@@ -2,7 +2,6 @@ package com.acmetelecom.exceptions;
 
 /**
  * This exception is thrown when an illegal call is trying to be initiated.
- * 
  */
 public class IllegalCallException extends Exception {
 

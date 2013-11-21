@@ -6,9 +6,16 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
+/**
+ * Concrete implementation of a call log as a list.
+ */
 public class ListCallLog implements CallLog {
+    // Maps a customer's phone number to a list of calls they have completed
     Map<String, List<FinishedCall>> callHistory;
 
+    /**
+     * Creates a new call log.
+     */
     public ListCallLog() {
 	callHistory = Maps.newHashMap();
     }

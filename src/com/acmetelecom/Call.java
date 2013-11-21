@@ -5,11 +5,7 @@ public abstract class Call {
     private final String caller;
     private final String callee;
 
-    /**
-     * A new constructor for the call class. A call is incomplete until the
-     * timeEnd is set.
-     */
-    public Call(final String caller, final String callee) {
+    Call(final String caller, final String callee) {
 	this.caller = caller;
 	this.callee = callee;
     }
@@ -22,8 +18,14 @@ public abstract class Call {
 	return callee;
     }
 
+    /**
+     * Returns the human readable call start time
+     */
     public abstract String date();
 
+    /**
+     * Returns the call start time
+     */
     public abstract Long startTime();
 
 }

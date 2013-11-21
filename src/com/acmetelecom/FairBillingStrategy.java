@@ -25,13 +25,18 @@ public class FairBillingStrategy implements BillingStrategy {
     public Bill generateBill(final Customer customer, final Iterable<FinishedCall> calls, final Tariff tariff) {
 	final List<LineItem> items = Lists.newArrayList();
 	BigDecimal totalBill = new BigDecimal(0);
-	for (final FinishedCall call : calls) {
-	    // Compute the current call cost
-	    final int noOfPeakSeconds = peakPeriod.getPeakSeconds(new DateTime(call.startTime()), new DateTime(call.endTime()));
 
+	// Add up the costs for each call to the total bill
+	for (final FinishedCall call : calls) {
+	    // Calculate the fraction of call time spend in the peak time
+	    // period and calculates the cost for that
+	    final int noOfPeakSeconds = peakPeriod.getPeakSeconds(new DateTime(call.startTime()), new DateTime(call.endTime()));
 	    final BigDecimal peakCost = new BigDecimal(noOfPeakSeconds).multiply(tariff.peakRate());
+
+	    // Calculate the cost for the off-peak fraction of the call
 	    final BigDecimal offPeakCost = new BigDecimal(call.durationSeconds() - noOfPeakSeconds).multiply(tariff.offPeakRate());
 
+	    // Sum up the peak and off-peak rates, rounding up
 	    BigDecimal callCost = peakCost.add(offPeakCost);
 	    callCost = callCost.setScale(0, RoundingMode.HALF_UP);
 

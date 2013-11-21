@@ -1,5 +1,6 @@
 package com.acmetelecom;
 
+@Deprecated
 public abstract class CallEvent {
     private final String caller;
     private final String callee;

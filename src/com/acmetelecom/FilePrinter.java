@@ -1,12 +1,18 @@
 package com.acmetelecom;
 
+/**
+ * Prints HTML to a file.
+ */
 public class FilePrinter implements Printer {
 
     private static Printer instance = new FilePrinter();
     private final StringBuilder billBuilder;
 
+    /**
+     * Singleton pattern.
+     */
     private FilePrinter() {
-	this.billBuilder = new StringBuilder();
+	billBuilder = new StringBuilder();
     }
 
     public static Printer getInstance() {
@@ -15,68 +21,89 @@ public class FilePrinter implements Printer {
 
     @Override
     public void printHeading(final String name, final String phoneNumber, final String pricePlan) {
-	this.beginHtml();
-	this.billBuilder.append(this.h2(name + "/" + phoneNumber + " - " + "Price Plan: " + pricePlan) + "\n");
-	this.beginTable();
+	beginHtml();
+	billBuilder.append(h2(name + "/" + phoneNumber + " - " + "Price Plan: " + pricePlan) + "\n");
+	beginTable();
     }
 
+    /**
+     * Begin HTML table.
+     */
     private void beginTable() {
-	this.billBuilder.append("<table border=\"1\">\n");
-	this.billBuilder.append(this.tr(this.th("Time") + this.th("Number") + this.th("Duration") + this.th("Cost")) + "\n");
+	billBuilder.append("<table border=\"1\">\n");
+	billBuilder.append(tr(th("Time") + th("Number") + th("Duration") + th("Cost")) + "\n");
     }
 
+    /**
+     * End HTML table.
+     */
     private void endTable() {
-	this.billBuilder.append("</table>\n");
+	billBuilder.append("</table>\n");
     }
 
+    /**
+     * Print HTML heading.
+     */
     private String h2(final String text) {
 	return "<h2>" + text + "</h2>";
     }
 
     @Override
     public void printItem(final String time, final String callee, final String duration, final String cost) {
-	this.billBuilder.append(this.tr(this.td(time) + this.td(callee) + this.td(duration) + this.td(cost)) + "\n");
+	billBuilder.append(tr(td(time) + td(callee) + td(duration) + td(cost)) + "\n");
     }
 
+    /**
+     * Print table row.
+     */
     private String tr(final String text) {
 	return "<tr>" + text + "</tr>";
     }
 
+    /**
+     * Print table heading.
+     */
     private String th(final String text) {
 	return "<th width=\"160\">" + text + "</th>";
     }
 
+    /**
+     * Print column.
+     */
     private String td(final String text) {
 	return "<td>" + text + "</td>";
     }
 
     @Override
     public void printTotal(final String total) {
-	this.endTable();
-	this.billBuilder.append(this.h2("Total: " + total) + "\n");
-	this.endHtml();
+	endTable();
+	billBuilder.append(h2("Total: " + total) + "\n");
+	endHtml();
     }
 
+    /**
+     * Annotates an HTML page.
+     */
     private void beginHtml() {
-	this.billBuilder.append("<html>\n");
-	this.billBuilder.append("<head></head>\n");
-	this.billBuilder.append("<body>\n");
-	this.billBuilder.append("<h1>\n");
-	this.billBuilder.append("Acme Telecom\n");
-	this.billBuilder.append("</h1>\n");
+	billBuilder.append("<html>\n");
+	billBuilder.append("<head></head>\n");
+	billBuilder.append("<body>\n");
+	billBuilder.append("<h1>\n");
+	billBuilder.append("Acme Telecom\n");
+	billBuilder.append("</h1>\n");
     }
 
     private void endHtml() {
-	this.billBuilder.append("</body>\n");
-	this.billBuilder.append("</html>\n");
+	billBuilder.append("</body>\n");
+	billBuilder.append("</html>\n");
     }
 
     public String getBill() {
-	return this.billBuilder.toString();
+	return billBuilder.toString();
     }
 
     public void flush() {
-	this.billBuilder.setLength(0);
+	billBuilder.setLength(0);
     }
 
 }
