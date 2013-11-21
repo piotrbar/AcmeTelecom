@@ -2,76 +2,39 @@ package com.acmetelecom;
 
 import static org.junit.Assert.assertEquals;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JMock;
-import org.jmock.integration.junit4.JUnit4Mockery;
-import org.jmock.lib.concurrent.Synchroniser;
-import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-@RunWith(JMock.class)
 public class CallTest {
 
-    Mockery context = new JUnit4Mockery() {
-	{
-	    setImposteriser(ClassImposteriser.INSTANCE);
-	    setThreadingPolicy(new Synchroniser());
-	}
-    };
-
-    // Mock meta-data
     final String caller = "447722113434";
     final String callee = "447766511332";
 
-    final long time = System.currentTimeMillis();
-    final long duration = 10000;
-    final long startTime = time - duration / 2;
-    final long endTime = time + duration / 2;
-
-    // Mock the CallStart and CallEnd events
-    final CallStart start = context.mock(CallStart.class);
-    final CallEnd end = context.mock(CallEnd.class);
+    final Long time = System.currentTimeMillis();
+    final Long duration = 10000L;
+    final Long startTime = time - duration / 2;
+    final Long endTime = time + duration / 2;
 
     @Before
-    public void setUp() {
-	// Set up the call start event
-	context.checking(new Expectations() {
-	    {
-		allowing(start).getCaller();
-		will(returnValue(caller));
-		allowing(start).getCallee();
-		will(returnValue(callee));
-		allowing(start).time();
-		will(returnValue(startTime));
+    public void setUp() throws Exception {
 
-		allowing(end).getCaller();
-		will(returnValue(caller));
-		allowing(end).getCallee();
-		will(returnValue(callee));
-		allowing(end).time();
-		will(returnValue(endTime));
-	    }
-	});
     }
 
     @Test
     public void testDurationSeconds() {
-	final Call call = new Call(start, end);
+	final FinishedCall call = new FinishedCall(caller, callee, startTime, endTime);
 	assertEquals(duration / 1000, call.durationSeconds());
     }
 
     @Test
     public void testStartTime() {
-	final Call call = new Call(start, end);
+	final FinishedCall call = new FinishedCall(caller, callee, startTime, endTime);
 	assertEquals(startTime, call.startTime());
     }
 
     @Test
     public void testEndTime() {
-	final Call call = new Call(start, end);
+	final FinishedCall call = new FinishedCall(caller, callee, startTime, endTime);
 	assertEquals(endTime, call.endTime());
     }
 

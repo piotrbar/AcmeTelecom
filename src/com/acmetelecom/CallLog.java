@@ -3,9 +3,9 @@ package com.acmetelecom;
 import java.util.List;
 
 public interface CallLog {
-    public void addCall(final Call c);
+    public void addCall(final FinishedCall c);
 
     public void clearCompletedCalls();
 
-    public List<Call> getCallsForCustomer(String caller);
+    public List<FinishedCall> getCallsForCustomer(String caller);
 }

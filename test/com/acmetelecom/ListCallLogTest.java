@@ -15,6 +15,9 @@ public class ListCallLogTest {
     private static final int caller2Calls = 1;
     private CallLog test;
 
+    private static final Long currentTime = System.currentTimeMillis();
+    private static final Long futureTime = currentTime + 1000;
+
     @Before
     public void setUp() throws Exception {
 	// Create a test call log
@@ -22,15 +25,11 @@ public class ListCallLogTest {
 
 	// Create a bunch of dummy calls and populate the call log
 	for (int i = 0; i < caller1Calls; i++) {
-	    Call c1 = new Call(caller1, caller2, System.currentTimeMillis());
-	    c1.completed(System.currentTimeMillis());
-	    test.addCall(c1);
+	    test.addCall(new FinishedCall(caller1, caller2, currentTime, futureTime));
 	}
 
 	for (int i = 0; i < caller2Calls; i++) {
-	    Call c2 = new Call(caller2, caller1, System.currentTimeMillis());
-	    c2.completed(System.currentTimeMillis());
-	    test.addCall(c2);
+	    test.addCall(new FinishedCall(caller2, caller1, currentTime, futureTime));
 	}
     }
 
@@ -52,15 +51,9 @@ public class ListCallLogTest {
 
     @Test
     public void testAddCall() {
-	// Create one extra dummy call for each caller
-	Call c1 = new Call(caller1, caller2, System.currentTimeMillis());
-	c1.completed(System.currentTimeMillis());
-	Call c2 = new Call(caller2, caller1, System.currentTimeMillis());
-	c2.completed(System.currentTimeMillis());
-
-	// Add the new calls to the call log
-	test.addCall(c1);
-	test.addCall(c2);
+	// Create one extra dummy call for each caller and add it to the calllog
+	test.addCall(new FinishedCall(caller1, caller2, currentTime, futureTime));
+	test.addCall(new FinishedCall(caller2, caller1, currentTime, futureTime));
 
 	assertEquals(caller1Calls + 1, test.getCallsForCustomer(caller1).size());
 	assertEquals(caller2Calls + 1, test.getCallsForCustomer(caller2).size());

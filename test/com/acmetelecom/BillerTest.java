@@ -132,7 +132,7 @@ public class BillerTest {
 	final long hourLength = 1000 * 60 * 60;
 	long timeStart = hourLength * 3; // 3am
 	for (final Customer customer : customers) {
-	    callLog.addCall(new Call(customer.getPhoneNumber(), "mother", timeStart, timeStart + hourLength));
+	    callLog.addCall(new FinishedCall(customer.getPhoneNumber(), "mother", timeStart, timeStart + hourLength));
 	}
 	final BigDecimal hourInSeconds = new BigDecimal(60 * 60);
 	context.checking(new Expectations() {
@@ -153,7 +153,7 @@ public class BillerTest {
 	// The default peak time is between 7 and 19
 	timeStart = hourLength * 15; // 3pm
 	for (final Customer customer : customers) {
-	    callLog.addCall(new Call(customer.getPhoneNumber(), "mother", timeStart, timeStart + hourLength));
+	    callLog.addCall(new FinishedCall(customer.getPhoneNumber(), "mother", timeStart, timeStart + hourLength));
 	}
 	context.checking(new Expectations() {
 	    {
@@ -187,11 +187,11 @@ public class BillerTest {
 	// The default peak time is between 7 and 19
 	final long hourLength = 1000 * 60 * 60;
 	// 6am to 8am = 2hr long
-	callLog.addCall(new Call(customers.get(0).getPhoneNumber(), "mother", hourLength * 6, hourLength * 8));
+	callLog.addCall(new FinishedCall(customers.get(0).getPhoneNumber(), "mother", hourLength * 6, hourLength * 8));
 	// 6pm to 8pm = 2hr long
-	callLog.addCall(new Call(customers.get(1).getPhoneNumber(), "mother", hourLength * 18, hourLength * 20));
+	callLog.addCall(new FinishedCall(customers.get(1).getPhoneNumber(), "mother", hourLength * 18, hourLength * 20));
 	// 6am to 8pm = 14hr long
-	callLog.addCall(new Call(customers.get(2).getPhoneNumber(), "mother", hourLength * 6, hourLength * 20));
+	callLog.addCall(new FinishedCall(customers.get(2).getPhoneNumber(), "mother", hourLength * 6, hourLength * 20));
 
 	final BigDecimal oneHoursInSeconds = new BigDecimal(1 * 60 * 60);
 	final BigDecimal twoHoursInSeconds = new BigDecimal(2 * 60 * 60);

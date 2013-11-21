@@ -37,34 +37,37 @@ public class CallTrackerTest {
 
     @Test
     public void testCompletingCall() throws IllegalCallException {
-	final Call initiatedCall = callTracker.callInitiated(caller, callee);
+	final ActiveCall initiatedCall = callTracker.callInitiated(caller, callee);
 
 	context.checking(new Expectations() {
 	    {
-		oneOf(callLog).addCall(initiatedCall);
+		oneOf(callLog).addCall(with(any(FinishedCall.class)));
 	    }
 	});
 
-	final Call completedCall = callTracker.callCompleted(caller, callee);
+	final FinishedCall completedCall = callTracker.callCompleted(caller, callee);
 
-	assertEquals(completedCall.callee(), completedCall.callee());
-	assertEquals(completedCall.caller(), completedCall.caller());
+	assertEquals(initiatedCall.callee(), completedCall.callee());
+	assertEquals(initiatedCall.caller(), completedCall.caller());
+	assertEquals(initiatedCall.startTime(), completedCall.startTime());
+	assertTrue(initiatedCall.startTime() < completedCall.endTime());
+
 	final boolean callCompletedBeforeNow = completedCall.endTime() <= System.currentTimeMillis();
 	assertTrue(callCompletedBeforeNow);
     }
 
     @Test(expected = IllegalCallException.class)
     public void testCantRecompleteCall() throws IllegalCallException {
-	final Call call = callTracker.callInitiated(caller, callee);
+	callTracker.callInitiated(caller, callee);
 	context.checking(new Expectations() {
 	    {
-		allowing(callLog).addCall(call);
+		allowing(callLog).addCall(with(any(FinishedCall.class)));
 	    }
 	});
 	callTracker.callCompleted(caller, callee);
 	context.checking(new Expectations() {
 	    {
-		never(callLog).addCall(call);
+		never(callLog).addCall(with(any(FinishedCall.class)));
 	    }
 	});
 	callTracker.callCompleted(caller, callee);

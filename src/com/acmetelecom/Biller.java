@@ -46,9 +46,9 @@ public class Biller {
 	BigDecimal totalBill = new BigDecimal(0);
 	final List<LineItem> items = new ArrayList<LineItem>();
 
-	final List<Call> calls = callLog.getCallsForCustomer(customer.getPhoneNumber());
+	final List<FinishedCall> calls = callLog.getCallsForCustomer(customer.getPhoneNumber());
 
-	for (final Call call : calls) {
+	for (final FinishedCall call : calls) {
 	    // Compute the current call cost
 	    final int noOfPeakSeconds = peakPeriod.getPeakSeconds(new DateTime(call.startTime()), new DateTime(call.endTime()));
 

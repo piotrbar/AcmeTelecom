@@ -44,10 +44,10 @@ public class BillingSystem {
     }
 
     static class LineItem {
-	private final Call call;
+	private final FinishedCall call;
 	private final BigDecimal callCost;
 
-	public LineItem(final Call call, final BigDecimal callCost) {
+	public LineItem(final FinishedCall call, final BigDecimal callCost) {
 	    this.call = call;
 	    this.callCost = callCost;
 	}

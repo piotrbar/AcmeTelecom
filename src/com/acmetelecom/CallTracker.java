@@ -11,7 +11,7 @@ import com.google.common.collect.Maps;
 
 public class CallTracker {
 
-    private final Map<String, Call> activeCalls;
+    private final Map<String, ActiveCall> activeCalls;
     private final CallLog callLog;
 
     private static final Logger LOG = LogManager.getLogger(CallTracker.class);
@@ -22,7 +22,7 @@ public class CallTracker {
 	this.callLog = callLog;
     }
 
-    public Call callInitiated(final String caller, final String callee) throws IllegalCallException {
+    public ActiveCall callInitiated(final String caller, final String callee) throws IllegalCallException {
 	if (caller.equals(callee)) {
 	    final String errorMessage = String.format("User %s cannot initiate a call to him/herself.", caller);
 	    LOG.error(errorMessage);
@@ -35,28 +35,30 @@ public class CallTracker {
 	    throw new IllegalCallException(errorMessage);
 	}
 
-	final Call call = new Call(caller, callee, System.currentTimeMillis());
-	activeCalls.put(caller, call);
-	activeCalls.put(callee, call);
-	return call;
+	final ActiveCall activeCall = new ActiveCall(caller, callee, System.currentTimeMillis());
+	activeCalls.put(caller, activeCall);
+	activeCalls.put(callee, activeCall);
+
+	return activeCall;
     }
 
     public boolean callInProgress(final String user) {
 	return activeCalls.containsKey(user);
     }
 
-    public Call callCompleted(final String caller, final String callee) throws IllegalCallException {
-	final Call call = activeCalls.get(caller);
-	if (call == null || !call.callee().equals(callee) || !call.caller().equals(caller)) {
+    public FinishedCall callCompleted(final String caller, final String callee) throws IllegalCallException {
+	final ActiveCall activeCall = activeCalls.get(caller);
+	if (activeCall == null || !activeCall.callee().equals(callee) || !activeCall.caller().equals(caller)) {
 	    final String errorMessage = String.format("User %s has not initiated a call with %s.", caller, callee);
 	    LOG.error(errorMessage);
 	    throw new IllegalCallException(errorMessage);
 	}
 
-	call.completed(System.currentTimeMillis());
-	callLog.addCall(call);
+	FinishedCall finishedCall = new FinishedCall(activeCall, System.currentTimeMillis());
+	callLog.addCall(finishedCall);
 	activeCalls.remove(caller);
 	activeCalls.remove(callee);
-	return call;
+
+	return finishedCall;
     }
 }

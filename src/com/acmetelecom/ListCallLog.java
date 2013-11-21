@@ -7,7 +7,7 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 public class ListCallLog implements CallLog {
-    Map<String, List<Call>> callHistory;
+    Map<String, List<FinishedCall>> callHistory;
 
     public ListCallLog() {
 	callHistory = Maps.newHashMap();
@@ -19,21 +19,22 @@ public class ListCallLog implements CallLog {
     }
 
     @Override
-    public void addCall(final Call c) {
-	List<Call> callerHistory = callHistory.get(c.caller());
+    public void addCall(final FinishedCall c) {
+	List<FinishedCall> callerHistory = callHistory.get(c.caller());
 	if (callerHistory == null) {
-	    callerHistory = new LinkedList<Call>();
+	    callerHistory = new LinkedList<FinishedCall>();
 	}
 	callerHistory.add(c);
 	callHistory.put(c.caller(), callerHistory);
     }
 
     @Override
-    public List<Call> getCallsForCustomer(final String caller) {
+    public List<FinishedCall> getCallsForCustomer(final String caller) {
 	if (callHistory.containsKey(caller)) {
 	    return callHistory.get(caller);
 	} else {
-	    return new LinkedList<Call>();
+	    return new LinkedList<FinishedCall>();
 	}
     }
+
 }
