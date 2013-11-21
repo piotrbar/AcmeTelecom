@@ -1,5 +1,5 @@
 Story: As a billing controller I want to generate customers' bills and charge them according to the correct tariff.
-The standard tariff fees are used for these scenarios. 0.2p/s for offpeak and 0.5p/s for peak. Peak starts at 11am and finishes at 7pm
+The standard tariff fees are used for these scenarios. 0.2p/s for offpeak and 0.5p/s for peak. Peak starts at 7am and finishes at 7pm
 
 Scenario: A user starts and finishes a call in the offpeak period
 Given users John,Dan with Standard tariff exist in the database

@@ -10,6 +10,11 @@
 
    <context:annotation-config/>
 
+   <bean id="peakPeriod" 
+         name="billing.peakperiod" 
+         class="com.acmetelecom.DaytimePeakPeriod"
+         scope="singleton" />
+         
    <bean id="htmlPrinter" 
          name="billing.printer" 
          class="com.acmetelecom.HtmlPrinter"

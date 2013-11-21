@@ -9,8 +9,6 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.acmetelecom.BillingSystem.LineItem;
-import com.acmetelecom.customer.CentralCustomerDatabase;
-import com.acmetelecom.customer.CentralTariffDatabase;
 import com.acmetelecom.customer.Customer;
 import com.acmetelecom.customer.CustomerDatabase;
 import com.acmetelecom.customer.Tariff;
@@ -22,20 +20,16 @@ public class Biller {
     private final TariffLibrary tariffLibrary;
     private final CustomerDatabase customerDatabase;
     private final BillGenerator billGenerator;
+    private final DaytimePeakPeriod peakPeriod;
 
     @Autowired
-    public Biller(final CallLog callLog, final TariffLibrary tariffLibrary, final CustomerDatabase customerDatabase, final BillGenerator billGenerator) {
+    public Biller(final CallLog callLog, final TariffLibrary tariffLibrary, final CustomerDatabase customerDatabase, final BillGenerator billGenerator,
+	    final DaytimePeakPeriod peakPeriod) {
 	this.callLog = callLog;
 	this.tariffLibrary = tariffLibrary;
 	this.customerDatabase = customerDatabase;
 	this.billGenerator = billGenerator;
-    }
-
-    public Biller(final CallLog callLog, final BillGenerator billGenerator) {
-	this.callLog = callLog;
-	this.billGenerator = billGenerator;
-	tariffLibrary = CentralTariffDatabase.getInstance();
-	customerDatabase = CentralCustomerDatabase.getInstance();
+	this.peakPeriod = peakPeriod;
     }
 
     public void createCustomerBills() {
@@ -47,32 +41,29 @@ public class Biller {
     }
 
     private void createBillFor(final Customer customer) {
-	final Iterable<Call> calls = callLog.getCallsForCustomer(customer.getPhoneNumber());
+	final Tariff tariff = tariffLibrary.tarriffFor(customer);
 
 	BigDecimal totalBill = new BigDecimal(0);
 	final List<LineItem> items = new ArrayList<LineItem>();
 
+	final List<Call> calls = callLog.getCallsForCustomer(customer.getPhoneNumber());
+
 	for (final Call call : calls) {
-
-	    final Tariff tariff = tariffLibrary.tarriffFor(customer);
-
-	    BigDecimal cost;
-
-	    final DaytimePeakPeriod peakPeriod = new DaytimePeakPeriod();
-
+	    // Compute the current call cost
 	    final int noOfPeakSeconds = peakPeriod.getPeakSeconds(new DateTime(call.startTime()), new DateTime(call.endTime()));
 
 	    final BigDecimal peakCost = new BigDecimal(noOfPeakSeconds).multiply(tariff.peakRate());
 	    final BigDecimal offPeakCost = new BigDecimal(call.durationSeconds() - noOfPeakSeconds).multiply(tariff.offPeakRate());
 
-	    cost = peakCost.add(offPeakCost);
+	    BigDecimal callCost = peakCost.add(offPeakCost);
+	    callCost = callCost.setScale(0, RoundingMode.HALF_UP);
 
-	    cost = cost.setScale(0, RoundingMode.HALF_UP);
-	    final BigDecimal callCost = cost;
+	    // Generate the total bill and the line in the final bill
 	    totalBill = totalBill.add(callCost);
 	    items.add(new LineItem(call, callCost));
 	}
 
 	billGenerator.send(customer, items, MoneyFormatter.penceToPounds(totalBill));
     }
+
 }

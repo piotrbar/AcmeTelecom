@@ -26,6 +26,7 @@ import com.acmetelecom.BillingSystem;
 import com.acmetelecom.Call;
 import com.acmetelecom.CallLog;
 import com.acmetelecom.CallTracker;
+import com.acmetelecom.DaytimePeakPeriod;
 import com.acmetelecom.FilePrinter;
 import com.acmetelecom.ListCallLog;
 import com.acmetelecom.customer.Customer;
@@ -51,6 +52,7 @@ public class AcmeTelecomSteps {
     private final TariffLibrary tariffLibrary;
     private final CustomerDatabase customerDatabase;
     private final List<Customer> customers;
+    private final DaytimePeakPeriod peakPeriod;
 
     private static final int MILLIS_PER_HOUR = 3600000;
     private static final int MILLIS_PER_SECOND = 1000;
@@ -72,7 +74,8 @@ public class AcmeTelecomSteps {
 	tracker = new CallTracker(callLog);
 	printer = (FilePrinter) FilePrinter.getInstance();
 	generator = new BillGenerator(printer);
-	biller = new Biller(callLog, tariffLibrary, customerDatabase, generator);
+	peakPeriod = new DaytimePeakPeriod(11, 19);
+	biller = new Biller(callLog, tariffLibrary, customerDatabase, generator, peakPeriod);
 	billingSystem = new BillingSystem(biller, tracker);
     }
 
