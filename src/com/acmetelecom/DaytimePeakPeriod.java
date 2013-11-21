@@ -5,7 +5,7 @@ import org.joda.time.Days;
 import org.joda.time.Interval;
 import org.joda.time.Seconds;
 
-class DaytimePeakPeriod {
+public class DaytimePeakPeriod {
 
     // TODO So far we only allow the peak period to start and finish at full
     // hours

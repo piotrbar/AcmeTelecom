@@ -29,6 +29,10 @@ public class BillerTest {
     private BillGenerator billGenerator;
     private List<Customer> customers;
 
+    // Peak time period
+    private final int peakStart = 7;
+    private final int peakEnd = 19;
+
     private CallLog callLog;
 
     private TariffLibrary tariffLibrary;
@@ -87,7 +91,7 @@ public class BillerTest {
 	billGenerator = context.mock(BillGenerator.class);
 
 	// Create the biller to test injecting all the dependencies
-	biller = new Biller(callLog, tariffLibrary, customerDatabase, billGenerator);
+	biller = new Biller(callLog, tariffLibrary, customerDatabase, billGenerator, new DaytimePeakPeriod(peakStart, peakEnd));
 
     }
 
